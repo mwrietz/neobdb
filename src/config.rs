@@ -12,7 +12,6 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Config {
     pub data_dir: String,
-    //pub backup_dir: String,
     pub db_filename: String,
 }
 
@@ -52,17 +51,15 @@ fn create_config_file() {
     let dot_config_path = get_dot_config_path();
     let config_file_path = dot_config_path.join("config.json");
     let data_dir_path = &dot_config_path;
-    //let backup_dir_path = dot_config_path.join("backups");
 
     // setup default values for config file
     let config = Config {
         data_dir: String::from(data_dir_path.to_string_lossy()),
         db_filename: String::from("beer.db"),
-        //backup_dir: String::from(backup_dir_path.to_string_lossy()),
     };
 
     // create config file
-    let cfg_file = File::create(&config_file_path).expect("file not created");
+    let cfg_file = File::create(&config_file_path).expect("config file not created");
     serde_json::to_writer_pretty(cfg_file, &config).expect("error writing to config");
 
     println!("Config file not found...");

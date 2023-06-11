@@ -4,15 +4,12 @@
 use rusqlite::{params, Connection, ToSql};
 use std::process::Command;
 use std::fs;
-//use crate::Path;
 use std::path::Path;
 
 use crate::beer_struct::Beer;
 use crate::ui;
 use crate::tui_inp;
 use crate::tui_gen;
-
-// todo: create data file if doesn't exist
 
 pub fn add(conn: &Connection) {
     tui_gen::cls();
@@ -126,7 +123,7 @@ pub fn edit(conn: &Connection) {
             &b.notes as &dyn ToSql,
             &b.id as &dyn ToSql,
         ])
-        .expect("add execute error");
+        .expect("edit() execute error");
 
         ui::show_summary(conn);
 
@@ -229,7 +226,7 @@ pub fn create_datafile_if_not_exist(db_path: &Path) {
         &beer.rating as &dyn ToSql,
         &beer.notes as &dyn ToSql,
     ])
-    .expect("add execute error");
+    .expect("create_datafile execute error");
 
     println!("Data file not found...");
     println!("Data file created: {:?}", db_path);

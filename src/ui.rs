@@ -132,7 +132,6 @@ pub fn print_summary_header() {
 }
 pub fn print_header() {
     let title = "DEFINITIVE BEER DATABASE";
-    //i_o::print_title_blue(&title);
     tui_gen::print_title(&title, "DARKBLUE");
 }
 
