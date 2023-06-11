@@ -25,7 +25,8 @@ fn main() {
 
     // read configuration file
     let config: Config = config::read_config_file();
-    let db_path = config.data_dir + "/beer.db";
+    //let db_path = config.data_dir + "/beer.db";
+    let db_path = config.data_dir + "/" + config.db_filename.as_str();
     // connect to database
     let conn = Connection::open(&db_path)
         .expect("cannot connecte to db");

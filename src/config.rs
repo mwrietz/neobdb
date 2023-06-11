@@ -11,7 +11,8 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Config {
     pub data_dir: String,
-    pub backup_dir: String,
+    //pub backup_dir: String,
+    pub db_filename: String,
 }
 
 pub fn read_config_file() -> Config {
@@ -41,7 +42,7 @@ fn get_dot_config_path() -> PathBuf {
 
     // create configuration folder if it doesn't exist (/home/user/.config/program_name) if it doesn't exist
     let dot_config_path = user_home_dir_path.join(".config").join(prog_file_name);
-    fs::create_dir_all(&dot_config_path).expect("cannot create backup folder");
+    fs::create_dir_all(&dot_config_path).expect("cannot create config folder");
 
     dot_config_path
 }
@@ -50,12 +51,13 @@ fn create_config_file() {
     let dot_config_path = get_dot_config_path();
     let config_file_path = dot_config_path.join("config.json");
     let data_dir_path = &dot_config_path;
-    let backup_dir_path = dot_config_path.join("backups");
+    //let backup_dir_path = dot_config_path.join("backups");
 
     // setup default values for config file
     let config = Config {
         data_dir: String::from(data_dir_path.to_string_lossy()),
-        backup_dir: String::from(backup_dir_path.to_string_lossy()),
+        db_filename: String::from("beer.db"),
+        //backup_dir: String::from(backup_dir_path.to_string_lossy()),
     };
 
     // create config file
