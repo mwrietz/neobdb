@@ -1,8 +1,11 @@
 // bdb - definitive beer database
-// 20220403
+// 20220611
 
 use rusqlite::{params, Connection, ToSql};
 use std::process::Command;
+use std::fs;
+//use crate::Path;
+use std::path::Path;
 
 use crate::beer_struct::Beer;
 use crate::ui;
@@ -172,4 +175,63 @@ pub fn vec_from_query(conn: &Connection, query: &str, beers: &mut Vec<Beer>) {
     for beer in beer_iter {
         beers.push(beer.unwrap());
     }
+}
+
+pub fn create_datafile_if_not_exist(db_path: &Path) {
+    let db_parent_name = db_path.parent().unwrap();
+
+    // create data folder if it doesn't exist
+    fs::create_dir_all(db_parent_name).expect("cannot create backup folder");
+
+    // create struct for first record in db 
+    let beer = Beer {
+        id: generate_uuid(),
+        timestamp: tui_gen::timestamp(),
+        name: "Budweiser".to_string(),
+        brewer: "Anheuser-Busch".to_string(),
+        style: "Pilsner".to_string(),
+        abv: "5.0%".to_string(),
+        rating: "*".to_string(),
+        notes: "yuck!".to_string(),
+    };
+
+    // create db file
+    let conn = Connection::open(db_path)
+        .expect("cannot create db file");
+
+    // create table: Beer
+    conn.execute(
+        "CREATE TABLE IF NOT EXISTS Beer (
+            id TEXT PRIMARY KEY,
+            timestamp TEXT NOT NULL,
+            name TEXT NOT NULL,
+            brewer TEXT NOT NULL,
+            style TEXT NOT NULL,
+            abv TEXT NOT NULL,
+            rating TEXT NOT NULL,
+            notes TEXT NOT NULL
+        )",
+        [],
+    ).expect("create table error");
+
+    // write to database
+    let query = "INSERT INTO Beer (id, timestamp, name, brewer, style, abv, rating, notes) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+
+    let mut stmt = conn.prepare(query).expect("add stmt error");
+
+    stmt.execute(&[
+        &beer.id as &dyn ToSql,
+        &beer.timestamp as &dyn ToSql,
+        &beer.name as &dyn ToSql,
+        &beer.brewer as &dyn ToSql,
+        &beer.style as &dyn ToSql,
+        &beer.abv as &dyn ToSql,
+        &beer.rating as &dyn ToSql,
+        &beer.notes as &dyn ToSql,
+    ])
+    .expect("add execute error");
+
+    println!("Data file not found...");
+    println!("Data file created: {:?}", db_path);
+    println!("Please start program again to use new data file.");
 }

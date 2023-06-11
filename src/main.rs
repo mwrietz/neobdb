@@ -1,8 +1,10 @@
 // bdb2 - definitive beer database
+// 20230611
 
 use rusqlite::Connection;
 use std::env;
 use std::process;
+use std::path::Path;
 
 mod beer_struct;
 mod config;
@@ -25,8 +27,14 @@ fn main() {
 
     // read configuration file
     let config: Config = config::read_config_file();
-    //let db_path = config.data_dir + "/beer.db";
     let db_path = config.data_dir + "/" + config.db_filename.as_str();
+
+    // check if db file exists
+    let p = Path::new(db_path.as_str());
+    if !p.exists() {
+        db::create_datafile_if_not_exist(&p);
+    }
+
     // connect to database
     let conn = Connection::open(&db_path)
         .expect("cannot connecte to db");

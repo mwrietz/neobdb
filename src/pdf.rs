@@ -1,15 +1,12 @@
 // pdf.rs
-// 20230604
+// 20230611
 
-//use rusqlite::{params, Connection, ToSql};
 use rusqlite::Connection;
 use crate::process;
 use crate::tui_gen;
 use crate::db;
 use crate::ui;
-//use crate::File;
 use std::fs::File;
-//use crate::Path;
 use std::path::Path;
 use std::io::Write;
 
@@ -17,7 +14,6 @@ use crate::beer_struct::Beer;
 use crate::config;
 use crate::config::Config;
 
-//pub fn create_pdf(beers: &mut Vec<Beer>) {
 pub fn create_pdf(conn: &Connection) {
     let config: Config = config::read_config_file();
     let parent_path = Path::new(&config.data_dir);
