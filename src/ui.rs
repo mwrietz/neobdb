@@ -10,16 +10,21 @@ pub fn show_found(conn: &Connection, search_string: &str) {
     tui_gen::cls();
     print_header();
 
-    let mut where_string: String = format!("name LIKE '%{}%'", search_string);
-    where_string.push_str(format!(" OR brewer LIKE '%{}%'", search_string).as_str());
-    where_string.push_str(format!(" OR style LIKE '%{}%'", search_string).as_str());
-    where_string.push_str(format!(" OR abv LIKE '%{}%'", search_string).as_str());
-    where_string.push_str(format!(" OR rating LIKE '%{}%'", search_string).as_str());
-    where_string.push_str(format!(" OR notes LIKE '%{}%'", search_string).as_str());
-
     let query = format!(
-        "SELECT * FROM Beer WHERE {} ORDER BY brewer, name",
-        where_string 
+        "SELECT * FROM Beer
+        WHERE name LIKE '%{}%' 
+        OR brewer LIKE '%{}%' 
+        OR style LIKE '%{}%' 
+        OR abv LIKE '%{}%' 
+        OR rating LIKE '%{}%' 
+        OR notes LIKE '%{}%' 
+        ORDER BY brewer, name",
+        search_string, 
+        search_string, 
+        search_string, 
+        search_string, 
+        search_string, 
+        search_string, 
     );
 
     let mut beers: Vec<Beer> = Vec::new();
