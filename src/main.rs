@@ -20,25 +20,27 @@ use crate::config::Config;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
+
     tui_gen::splash_screen(
         "D E F I N I T I V E  B E E R  D A T A B A S E",
         env!("CARGO_PKG_VERSION"),
     );
 
-    // read configuration file
+    // read configuration file and assemble db filepath
     let config: Config = config::read_config_file();
     let db_path = config.data_dir + "/" + config.db_filename.as_str();
+    let db_path = Path::new(db_path.as_str());
 
     // check if db file exists
-    let p = Path::new(db_path.as_str());
-    if !p.exists() {
-        db::create_datafile_if_not_exist(&p);
+    if !db_path.exists() {
+        db::create_database_if_not_exist(&db_path);
     }
 
     // connect to database
-    let conn = Connection::open(&db_path)
+    let conn = Connection::open(db_path)
         .expect("cannot connecte to db");
 
+    // check for command line arguments
     if args.len() < 2 {
         tui_gen::cls();
         ui::print_header();
@@ -69,20 +71,19 @@ fn main() {
 }
 
 fn menu(conn: &Connection) {
+    let menu_items = vec![
+        ("d", "Details"),
+        ("s", "Summary"),
+        ("a", "Add"),
+        ("r", "Remove"),
+        ("e", "Edit"),
+        ("f", "Find"),
+        ("p", "Pdf"),
+        ("q", "Quit"),
+    ];
+
     loop {
-        let menu_items = vec![
-            ("d", "Details"),
-            ("s", "Summary"),
-            ("a", "Add"),
-            ("r", "Remove"),
-            ("e", "Edit"),
-            ("f", "Find"),
-            ("p", "Pdf"),
-            ("q", "Quit"),
-        ];
-
         let selection = tui_menu::menu_horiz(&menu_items);
-
         match selection {
             'a' => db::add(conn),
             'r' => db::remove(conn),

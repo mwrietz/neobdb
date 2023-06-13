@@ -48,14 +48,15 @@ pub fn add(conn: &Connection) {
 }
 
 pub fn remove(conn: &Connection) {
+    // show summary and request index to delete
+    ui::show_summary(conn);
+    let index = tui_inp::get_int("Enter index of item to remove: ") as usize;
+
     // read all data from database into vector of beers
     let query = "SELECT * FROM Beer ORDER BY brewer, name";
     let mut beers: Vec<Beer> = Vec::new();
     vec_from_query(conn, query, &mut beers);
 
-    // show summary and request index to delete
-    ui::show_summary(conn);
-    let index = tui_inp::get_int("Enter index of item to remove: ") as usize;
     let b = beers.get(index).expect("error");
 
     let prompt = format!(
@@ -174,7 +175,7 @@ pub fn vec_from_query(conn: &Connection, query: &str, beers: &mut Vec<Beer>) {
     }
 }
 
-pub fn create_datafile_if_not_exist(db_path: &Path) {
+pub fn create_database_if_not_exist(db_path: &Path) {
     let db_parent_name = db_path.parent().unwrap();
 
     // create data folder if it doesn't exist
