@@ -55,7 +55,7 @@ pub fn menu_horiz(items: &Vec<(&str, &str)>) -> char {
     let (_width, height) = tsize();
     cmove(0, height - 2);
 
-    horiz_line("blue");
+    horiz_line("DARKBLUE");
     for item in items.iter() {
         //print!("{:>4}:{}", item.0.green(), item.1);
         let buffer = format!("{:>4}", item.0);
