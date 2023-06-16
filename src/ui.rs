@@ -4,7 +4,6 @@ use rusqlite::Connection;
 
 use crate::beer_struct::Beer;
 use crate::db;
-use crate::ui;
 use crate::tui_gen;
 use crate::tui_menu;
 
@@ -142,7 +141,7 @@ impl View {
 
             tui_gen::cls();
             print_header();
-            if self.state == ui::State::Summary {
+            if self.state == State::Summary {
                 print_summary_header();
             }
             self.display_filter();
@@ -173,11 +172,11 @@ impl View {
                     }
                 },
                 'v' => {
-                    if self.state == ui::State::Summary {
-                        self.state = ui::State::Detail;
+                    if self.state == State::Summary {
+                        self.state = State::Detail;
                         self.offset = 0;
                     } else {
-                        self.state = ui::State::Summary;
+                        self.state = State::Summary;
                         self.offset = 0;
                     }
                 },
@@ -194,7 +193,7 @@ impl View {
         print!("Search String: '");
         tui_gen::print_color(self.filter.as_str(), "DARKGREEN");
         print!("'");
-        if self.state == ui::State::Summary {
+        if self.state == State::Summary {
             tui_gen::cmove(0, 5);
         } else {
             tui_gen::cmove(0, 4);
@@ -217,7 +216,6 @@ pub fn print_header() {
     tui_gen::print_color(tui_gen::get_prog_name().as_str(), "DARKGREEN");
     tui_gen::print_color(format!(" v{}", env!("CARGO_PKG_VERSION")).as_str(), "DARKBLUE");
     tui_gen::print_color(")", "DARKBLUE");
-
     tui_gen::cmove(0, 4);
 }
 

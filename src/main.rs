@@ -108,29 +108,26 @@ fn menu(conn: &Connection) {
         match selection {
             'j' => {
                 // scroll_dn if not last page
-
                 if (v.offset + v.limit()) < v.filter_count {
                     v.offset += v.limit();
                 }
                 v.clone().show(&conn);
-            },
+            }
             'k' => {
                 // scroll_up if not first page
                 if v.offset >= v.limit() {
                     v.offset -= v.limit();
                 }
                 v.clone().show(&conn);
-            },
+            }
             'v' => {
-                if v.state == ui::State::Summary {
-                    v.state = ui::State::Detail;
-                    v.offset = 0;
-                } else {
-                    v.state = ui::State::Summary;
-                    v.offset = 0;
+                match v.state {
+                    ui::State::Summary => v.state = ui::State::Detail,
+                    ui::State::Detail => v.state = ui::State::Summary,
                 }
+                v.offset = 0;
                 v.clone().show(&conn);
-            },
+            }
             'a' => {
                 db::add(&conn);
                 v.clone().show(&conn);

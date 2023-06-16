@@ -49,8 +49,9 @@ pub fn add(conn: &Connection) {
 
 pub fn remove(conn: &Connection) {
     // verify if index within displayed page
-    let buffer = tui_inp::dialog_box_get_string(42, 4, "Remove", "Enter index of item to remove: ");
-    let index = buffer.parse::<usize>().unwrap();
+    let index = tui_inp::dialog_box_get_string(42, 4, "Remove", "Enter index of item to remove: ")
+        .parse::<usize>()
+        .unwrap();
 
     // read all data from database into vector of beers
     let query = "SELECT * FROM Beer ORDER BY brewer, name";
@@ -76,8 +77,9 @@ pub fn remove(conn: &Connection) {
 
 pub fn edit(conn: &Connection) {
     // make sure index on displayed page
-    let buffer = tui_inp::dialog_box_get_string(42, 4, "Edit", "Enter index of item to edit: ");
-    let index = buffer.parse::<usize>().unwrap();
+    let index = tui_inp::dialog_box_get_string(42, 4, "Edit", "Enter index of item to edit: ")
+        .parse::<usize>()
+        .unwrap();
 
     let query = "SELECT * FROM Beer ORDER BY brewer, name";
     let mut beers: Vec<Beer> = Vec::new();
@@ -130,8 +132,6 @@ pub fn edit(conn: &Connection) {
         println!("");
         println!("Updated record...");
         b.print_details(index);
-    } else {
-        //ui::show_summary(conn);
     }
 }
 
