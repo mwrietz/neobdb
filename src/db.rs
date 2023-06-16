@@ -45,14 +45,10 @@ pub fn add(conn: &Connection) {
         &beer.notes as &dyn ToSql,
     ])
     .expect("add execute error");
-
-    //ui::show_summary(conn);
 }
 
 pub fn remove(conn: &Connection) {
-    // show summary and request index to delete
-    //ui::show_summary(conn);
-    //let index = tui_inp::get_int("Enter index of item to remove: ") as usize;
+    // verify if index within displayed page
     let buffer = tui_inp::dialog_box_get_string(42, 4, "Remove", "Enter index of item to remove: ");
     let index = buffer.parse::<usize>().unwrap();
 
@@ -76,21 +72,16 @@ pub fn remove(conn: &Connection) {
         conn.execute(query.as_str(), [])
             .expect("remove() execute error");
     }
-    //ui::show_summary(conn);
 }
 
 pub fn edit(conn: &Connection) {
-    //ui::show_summary(conn);
-    //let index = tui_inp::get_int("Enter index of item to edit: ") as usize;
+    // make sure index on displayed page
     let buffer = tui_inp::dialog_box_get_string(42, 4, "Edit", "Enter index of item to edit: ");
     let index = buffer.parse::<usize>().unwrap();
 
     let query = "SELECT * FROM Beer ORDER BY brewer, name";
     let mut beers: Vec<Beer> = Vec::new();
     vec_from_query(conn, query, &mut beers);
-
-    //beers[index].print_details(index);
-    //println!("");
 
     let prompt = format!(
         "Are you sure you want to edit index {}: \"{}\" - (y/n)? ",
@@ -135,8 +126,6 @@ pub fn edit(conn: &Connection) {
             &b.id as &dyn ToSql,
         ])
         .expect("edit() execute error");
-
-        //ui::show_summary(conn);
 
         println!("");
         println!("Updated record...");

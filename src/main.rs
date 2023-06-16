@@ -1,5 +1,5 @@
 // bdb2 - definitive beer database
-// 20230611
+// 20230616
 
 use rusqlite::Connection;
 use std::env;
@@ -17,7 +17,6 @@ mod tui_menu;
 mod ui;
 
 use crate::config::Config;
-//use ui::State;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
@@ -53,7 +52,6 @@ fn main() {
     if args.len() < 2 {
         tui_gen::cls();
         ui::print_header();
-        //ui::show_summary(&conn);
         v.summary(&conn);
 
         menu(&conn);
@@ -64,20 +62,16 @@ fn main() {
             "-a" | "--add" => db::add(&conn),
             "-r" | "--remove" => db::remove(&conn),
             "-e" | "--edit" => db::edit(&conn),
-            //"-f" | "--find" => ui::show_found(&conn, &args[2]),
             "-f" | "--find" => {
                 v.filter = args[2].clone();
                 v.find(&conn);
             }
-            //"-sa" | "--show_all" => ui::show_all(&conn),
             "-sa" | "--show_all" => v.detail(&conn),
-            //"-ss" | "--show_sum" => ui::show_summary(&conn),
             "-ss" | "--show_sum" => v.summary(&conn),
             "-p" | "--pdf" => pdf::create_pdf(&conn),
             "-m" | "--menu" => {
                 tui_gen::cls();
                 ui::print_header();
-                //ui::show_summary(&conn);
                 v.summary(&conn);
                 menu(&conn);
             }
@@ -101,8 +95,6 @@ fn menu(conn: &Connection) {
         ("j", "Scroll_DN"),
         ("k", "Scroll_UP"),
         ("v", "Detail/Summary"),
-        //("d", "Details"),
-        //("s", "Summary"),
         ("a", "Add"),
         ("r", "Remove"),
         ("e", "Edit"),
@@ -117,19 +109,13 @@ fn menu(conn: &Connection) {
             'j' => {
                 // scroll_dn if not last page
 
-                // if filter == '*'
-                //let n_rows = db::count_rows_in_table(conn, "Beer");
-                //if (v.offset + v.limit()) < n_rows {
                 if (v.offset + v.limit()) < v.filter_count {
                     v.offset += v.limit();
                 }
-                // if search_sting == 'else'
-                // n_rows = query_len()
                 v.clone().show(&conn);
             },
             'k' => {
-                // scroll_up
-                //let n_rows = db::count_rows_in_table(conn, "Beer");
+                // scroll_up if not first page
                 if v.offset >= v.limit() {
                     v.offset -= v.limit();
                 }
@@ -157,12 +143,9 @@ fn menu(conn: &Connection) {
                 db::edit(&conn);
                 v.clone().show(&conn);
             }
-            //'d' => ui::show_all(conn),
-            //'s' => ui::show_summary(conn),
             'p' => pdf::create_pdf(&conn),
             'f' => {
                 v.filter = tui_inp::dialog_box_get_string(50, 4, "Find", "Enter search string: ");
-                //ui::show_found(conn, search_string.as_str());
                 v.find(&conn);
                 v.clone().show(&conn);
             }

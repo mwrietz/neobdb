@@ -1,4 +1,4 @@
-// 20230611
+// 20230616
 
 use rusqlite::Connection;
 
@@ -14,7 +14,6 @@ pub enum State {
     Detail,
 }
 
-//#[derive(Copy, Clone)]
 #[derive(Clone)]
 pub struct View {
     pub state: State,
@@ -87,8 +86,6 @@ impl View {
     }
     
     pub fn find(&mut self, conn: &Connection) {
-        //tui_gen::cls();
-        //print_header();
 
         let query = format!(
             "SELECT COUNT(*) FROM Beer
@@ -168,15 +165,12 @@ impl View {
                     if (self.offset + self.limit()) < self.filter_count {
                         self.offset += self.limit();
                     }
-                    //self.show(&conn);
                 },
                 'k' => {
                     // scroll_up
-                    //let n_rows = db::count_rows_in_table(conn, "Beer");
                     if self.offset >= self.limit() {
                         self.offset -= self.limit();
                     }
-                    //self.show(&conn);
                 },
                 'v' => {
                     if self.state == ui::State::Summary {
@@ -186,12 +180,10 @@ impl View {
                         self.state = ui::State::Summary;
                         self.offset = 0;
                     }
-                    //self.show(&conn);
                 },
                 _ => {
                     self.filter_count = db::count_rows_in_table(&conn, "Beer");
                     self.filter = String::from(" ");
-                    //self.show(&conn);
                     break;
                 }
             }
@@ -199,7 +191,9 @@ impl View {
     }
     fn display_filter(&self) {
         tui_gen::cmove(72, 1);
-        println!("Search String: '{}'", self.filter);
+        print!("Search String: '");
+        tui_gen::print_color(self.filter.as_str(), "DARKGREEN");
+        print!("'");
         if self.state == ui::State::Summary {
             tui_gen::cmove(0, 5);
         } else {
@@ -207,129 +201,6 @@ impl View {
         }
     }
 }
-
-/*
-pub fn show_found(conn: &Connection, search_string: &str) {
-    tui_gen::cls();
-    print_header();
-
-    let query = format!(
-        "SELECT * FROM Beer
-        WHERE name LIKE '%{}%' 
-        OR brewer LIKE '%{}%' 
-        OR style LIKE '%{}%' 
-        OR abv LIKE '%{}%' 
-        OR rating LIKE '%{}%' 
-        OR notes LIKE '%{}%' 
-        ORDER BY brewer, name",
-        search_string, 
-        search_string, 
-        search_string, 
-        search_string, 
-        search_string, 
-        search_string, 
-    );
-
-    let mut beers: Vec<Beer> = Vec::new();
-    db::vec_from_query(conn, query.as_str(), &mut beers);
-
-    let (_width, height) = tui_gen::tsize();
-    let page_limit: i32 = (height as i32 - 10) / 4;
-
-    let mut index: usize = 0;
-    let mut count: i32 = 0;
-    for b in &beers {
-        b.print_details(index as usize);
-        count += 1;
-        index += 1;
-        if count == page_limit {
-            tui_gen::pause();
-            tui_gen::cls();
-            print_header();
-            count = 0;
-        }
-    }
-    println!("");
-}
-*/
-
-/*
-pub fn show_all(conn: &Connection) {
-    tui_gen::cls();
-    print_header();
-
-    let n_rows = db::count_rows_in_table(conn, "Beer");
-    let (_width, height) = tui_gen::tsize();
-    let page_limit: i32 = (height as i32 - 6) / 4;
-    let mut n_pages = 1;
-    if n_rows > page_limit {
-        n_pages = n_rows / page_limit + 1;
-    }
-
-    let mut index: usize = 0;
-    for i in 0..n_pages {
-        let query = format!(
-            "SELECT * FROM Beer ORDER BY brewer, name LIMIT {} OFFSET {}",
-            page_limit,
-            i * page_limit,
-        );
-        let mut beers: Vec<Beer> = Vec::new();
-        db::vec_from_query(conn, query.as_str(), &mut beers);
-
-        for b in beers {
-            b.print_details(index);
-            index += 1;
-        }
-        if i < n_pages - 1 {
-            tui_gen::pause();
-            tui_gen::cls();
-            print_header();
-        }
-    }
-    println!("");
-}
-*/
-
-/*
-pub fn show_summary(conn: &Connection) {
-    tui_gen::cls();
-    print_header();
-    print_summary_header();
-
-    // determine number of pages required
-    let n_rows = db::count_rows_in_table(conn, "Beer");
-    let (_width, height) = tui_gen::tsize();
-    let page_limit: i32 = height as i32 - 10;
-    let mut n_pages = 1;
-    if n_rows > page_limit {
-        n_pages = n_rows / page_limit + 1;
-    }
-
-    // loop thru pages
-    let mut index: usize = 0;
-    for i in 0..n_pages {
-        let query = format!(
-            "SELECT * FROM Beer ORDER BY brewer, name LIMIT {} OFFSET {}",
-            page_limit,
-            i * page_limit,
-        );
-        let mut beers: Vec<Beer> = Vec::new();
-        db::vec_from_query(conn, query.as_str(), &mut beers);
-
-        for b in beers {
-            b.print_summary(index);
-            index += 1;
-        }
-        if i < n_pages - 1 {
-            tui_gen::pause();
-            tui_gen::cls();
-            print_header();
-            print_summary_header();
-        }
-    }
-    println!("");
-}
-*/
 
 pub fn print_summary_header() {
     let header_string = format!(
