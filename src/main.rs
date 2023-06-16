@@ -17,6 +17,7 @@ mod tui_menu;
 mod ui;
 
 use crate::config::Config;
+//use ui::State;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
@@ -40,26 +41,44 @@ fn main() {
     let conn = Connection::open(db_path)
         .expect("cannot connecte to db");
 
+    let mut v = ui::View {
+        state: ui::State::Summary,
+        height: tui_gen::t_height(),
+        offset: 0,
+        filter_count: db::count_rows_in_table(&conn, "Beer"),
+        filter: String::from("*"),
+    };
+
     // check for command line arguments
     if args.len() < 2 {
         tui_gen::cls();
         ui::print_header();
-        ui::show_summary(&conn);
+        //ui::show_summary(&conn);
+        v.summary(&conn);
+
         menu(&conn);
-    } else {
+    } 
+    else {
         let cmd = &args[1];
         match &cmd[..] {
             "-a" | "--add" => db::add(&conn),
             "-r" | "--remove" => db::remove(&conn),
             "-e" | "--edit" => db::edit(&conn),
-            "-f" | "--find" => ui::show_found(&conn, &args[2]),
-            "-sa" | "--show_all" => ui::show_all(&conn),
-            "-ss" | "--show_sum" => ui::show_summary(&conn),
+            //"-f" | "--find" => ui::show_found(&conn, &args[2]),
+            "-f" | "--find" => {
+                v.filter = args[2].clone();
+                v.find(&conn);
+            }
+            //"-sa" | "--show_all" => ui::show_all(&conn),
+            "-sa" | "--show_all" => v.detail(&conn),
+            //"-ss" | "--show_sum" => ui::show_summary(&conn),
+            "-ss" | "--show_sum" => v.summary(&conn),
             "-p" | "--pdf" => pdf::create_pdf(&conn),
             "-m" | "--menu" => {
                 tui_gen::cls();
                 ui::print_header();
-                ui::show_summary(&conn);
+                //ui::show_summary(&conn);
+                v.summary(&conn);
                 menu(&conn);
             }
             _ => {
@@ -71,9 +90,19 @@ fn main() {
 }
 
 fn menu(conn: &Connection) {
+    let mut v = ui::View {
+        state: ui::State::Summary,
+        height: tui_gen::t_height(),
+        offset: 0,
+        filter_count: db::count_rows_in_table(conn, "Beer"),
+        filter: String::from("*"),
+    };
     let menu_items = vec![
-        ("d", "Details"),
-        ("s", "Summary"),
+        ("j", "Scroll_DN"),
+        ("k", "Scroll_UP"),
+        ("v", "Detail/Summary"),
+        //("d", "Details"),
+        //("s", "Summary"),
         ("a", "Add"),
         ("r", "Remove"),
         ("e", "Edit"),
@@ -85,16 +114,57 @@ fn menu(conn: &Connection) {
     loop {
         let selection = tui_menu::menu_horiz(&menu_items);
         match selection {
-            'a' => db::add(conn),
-            'r' => db::remove(conn),
-            'e' => db::edit(conn),
-            'd' => ui::show_all(conn),
-            's' => ui::show_summary(conn),
-            'p' => pdf::create_pdf(conn),
+            'j' => {
+                // scroll_dn if not last page
+
+                // if filter == '*'
+                //let n_rows = db::count_rows_in_table(conn, "Beer");
+                //if (v.offset + v.limit()) < n_rows {
+                if (v.offset + v.limit()) < v.filter_count {
+                    v.offset += v.limit();
+                }
+                // if search_sting == 'else'
+                // n_rows = query_len()
+                v.clone().show(&conn);
+            },
+            'k' => {
+                // scroll_up
+                //let n_rows = db::count_rows_in_table(conn, "Beer");
+                if v.offset >= v.limit() {
+                    v.offset -= v.limit();
+                }
+                v.clone().show(&conn);
+            },
+            'v' => {
+                if v.state == ui::State::Summary {
+                    v.state = ui::State::Detail;
+                    v.offset = 0;
+                } else {
+                    v.state = ui::State::Summary;
+                    v.offset = 0;
+                }
+                v.clone().show(&conn);
+            },
+            'a' => {
+                db::add(&conn);
+                v.clone().show(&conn);
+            }
+            'r' => {
+                db::remove(&conn);
+                v.clone().show(&conn);
+            }
+            'e' => {
+                db::edit(&conn);
+                v.clone().show(&conn);
+            }
+            //'d' => ui::show_all(conn),
+            //'s' => ui::show_summary(conn),
+            'p' => pdf::create_pdf(&conn),
             'f' => {
-                let search_string =
-                    tui_inp::dialog_box_get_string(50, 4, "Find", "Enter search string: ");
-                ui::show_found(conn, search_string.as_str());
+                v.filter = tui_inp::dialog_box_get_string(50, 4, "Find", "Enter search string: ");
+                //ui::show_found(conn, search_string.as_str());
+                v.find(&conn);
+                v.clone().show(&conn);
             }
             'q' => {
                 tui_gen::cls();

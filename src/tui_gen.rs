@@ -192,3 +192,12 @@ pub fn tsize() -> (usize, usize) {
     };
     (w as usize, h as usize)
 }
+
+pub fn t_height() -> usize {
+    let size = crossterm::terminal::size();
+    let (_w, h) = match size {
+        Ok((w, h)) => (w, h),
+        Err(error) => panic!("tsize error: {:?}", error),
+    };
+    h as usize
+}

@@ -15,6 +15,8 @@ pub fn add(conn: &Connection) {
     tui_gen::cls();
     ui::print_header();
 
+    println!("\nAdd new record...\n");
+
     // setup Beer struct
     let beer = Beer {
         id: generate_uuid(),
@@ -44,13 +46,15 @@ pub fn add(conn: &Connection) {
     ])
     .expect("add execute error");
 
-    ui::show_summary(conn);
+    //ui::show_summary(conn);
 }
 
 pub fn remove(conn: &Connection) {
     // show summary and request index to delete
-    ui::show_summary(conn);
-    let index = tui_inp::get_int("Enter index of item to remove: ") as usize;
+    //ui::show_summary(conn);
+    //let index = tui_inp::get_int("Enter index of item to remove: ") as usize;
+    let buffer = tui_inp::dialog_box_get_string(42, 4, "Remove", "Enter index of item to remove: ");
+    let index = buffer.parse::<usize>().unwrap();
 
     // read all data from database into vector of beers
     let query = "SELECT * FROM Beer ORDER BY brewer, name";
@@ -63,32 +67,38 @@ pub fn remove(conn: &Connection) {
         "Are you sure you want to remove index {}: \"{}\" - (y/n)? ",
         index, b.name
     );
-    let action = tui_inp::get_string(&prompt);
+    //let action = tui_inp::get_string(&prompt);
+    let width = prompt.len() + 7;
+    let action = tui_inp::dialog_box_get_string(width, 4, "Verify", &prompt);
 
     if action.eq("y") {
         let query = format!("DELETE FROM Beer WHERE id = '{}'", b.id);
         conn.execute(query.as_str(), [])
             .expect("remove() execute error");
     }
-    ui::show_summary(conn);
+    //ui::show_summary(conn);
 }
 
 pub fn edit(conn: &Connection) {
-    ui::show_summary(conn);
-    let index = tui_inp::get_int("Enter index of item to edit: ") as usize;
+    //ui::show_summary(conn);
+    //let index = tui_inp::get_int("Enter index of item to edit: ") as usize;
+    let buffer = tui_inp::dialog_box_get_string(42, 4, "Edit", "Enter index of item to edit: ");
+    let index = buffer.parse::<usize>().unwrap();
 
     let query = "SELECT * FROM Beer ORDER BY brewer, name";
     let mut beers: Vec<Beer> = Vec::new();
     vec_from_query(conn, query, &mut beers);
 
-    beers[index].print_details(index);
-    println!("");
+    //beers[index].print_details(index);
+    //println!("");
 
     let prompt = format!(
         "Are you sure you want to edit index {}: \"{}\" - (y/n)? ",
         index, beers[index].name
     );
-    let action = tui_inp::get_string(&prompt);
+    let width = prompt.len() + 7;
+    let action = tui_inp::dialog_box_get_string(width, 4, "Verify", &prompt);
+
     if action.eq("y") {
         tui_gen::cls();
         ui::print_header();
@@ -126,22 +136,29 @@ pub fn edit(conn: &Connection) {
         ])
         .expect("edit() execute error");
 
-        ui::show_summary(conn);
+        //ui::show_summary(conn);
 
         println!("");
         println!("Updated record...");
         b.print_details(index);
     } else {
-        ui::show_summary(conn);
+        //ui::show_summary(conn);
     }
 }
 
-pub fn count_rows_in_table(conn: &Connection, table_name: &str) -> i32 {
+pub fn count_rows_in_table(conn: &Connection, table_name: &str) -> usize {
     let query = format!("SELECT COUNT(*) FROM {}", table_name);
     let count: i64 = conn
         .query_row(query.as_str(), params![], |row| row.get(0))
         .expect("count_rows_in_table() error");
-    count as i32
+    count as usize 
+}
+
+pub fn count_rows_in_query(conn: &Connection, query: &str) -> usize {
+    let count: i64 = conn
+        .query_row(query, params![], |row| row.get(0))
+        .expect("count_rows_in_query() error");
+    count as usize
 }
 
 fn generate_uuid() -> String {
