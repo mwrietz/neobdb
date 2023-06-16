@@ -212,6 +212,13 @@ pub fn print_summary_header() {
 pub fn print_header() {
     let title = "DEFINITIVE BEER DATABASE";
     tui_gen::print_title(&title, "DARKBLUE");
+    tui_gen::cmove(50, 1);
+    tui_gen::print_color("(", "DARKBLUE");
+    tui_gen::print_color(tui_gen::get_prog_name().as_str(), "DARKGREEN");
+    tui_gen::print_color(format!(" v{}", env!("CARGO_PKG_VERSION")).as_str(), "DARKBLUE");
+    tui_gen::print_color(")", "DARKBLUE");
+
+    tui_gen::cmove(0, 4);
 }
 
 pub fn usage() {
