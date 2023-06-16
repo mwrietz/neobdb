@@ -115,7 +115,7 @@ pub fn splash_screen(line1: &str, line2: &str) {
     let line1_length: usize = line1.len();
     cmove(width / 2 - line1_length / 2, height / 2 - 1);
     //println!("{}", line1.bold());
-    print_color_bold(line1, "WHITE");
+    print_color_bold(line1, "DARKBLUE");
 
     let line2_length: usize = line2.len();
     cmove(width / 2 - line2_length / 2, height / 2 + 1);

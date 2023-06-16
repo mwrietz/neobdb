@@ -23,7 +23,7 @@ fn main() {
 
     tui_gen::splash_screen(
         "D E F I N I T I V E  B E E R  D A T A B A S E",
-        env!("CARGO_PKG_VERSION"),
+        format!("v{}", env!("CARGO_PKG_VERSION")).as_str(),
     );
 
     // read configuration file and assemble db filepath
