@@ -24,11 +24,18 @@ pub struct View {
 
 impl View {
     pub fn limit(&self) -> usize {
-        let lines_per_record: usize = match self.state {
-            State::Summary => 1,
-            State::Detail => 4,
+        let lines_per_record: usize;
+        let record_limit: usize;
+        match self.state {
+            State::Summary => {
+                lines_per_record = 1;
+                record_limit = (self.height - 8) / lines_per_record;
+            }
+            State::Detail => {
+                lines_per_record = 4;
+                record_limit = (self.height - 6) / lines_per_record;
+            }
         };
-        let record_limit = (self.height - 10) / lines_per_record;
         record_limit
     }
 
