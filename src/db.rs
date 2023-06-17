@@ -154,7 +154,10 @@ fn generate_uuid() -> String {
     let output = Command::new("uuidgen")
         .output()
         .expect("generate_uuid() error");
-    let uuid = String::from_utf8_lossy(&output.stdout).into_owned();
+    let binding = String::from_utf8_lossy(&output.stdout);
+    let uuid = binding.as_ref() 
+        .trim_end_matches('\n')
+        .to_string();
     uuid
 }
 
