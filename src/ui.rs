@@ -141,18 +141,20 @@ impl View {
             db::vec_from_query(conn, query.as_str(), &mut beers);
 
             tui_gen::cls();
-            print_header();
-            if self.state == State::Summary {
-                print_summary_header();
+            match self.state {
+                State::Summary => {
+                    print_header();
+                    print_summary_header();
+                }
+                State::Detail => print_header(),
             }
             self.display_filter();
 
             let mut index: usize = self.offset;
             for b in beers {
-                if self.state == State::Detail {
-                    b.print_details(index);
-                } else {
-                    b.print_summary(index);
+                match self.state {
+                    State::Summary => b.print_summary(index),
+                    State::Detail => b.print_details(index),
                 }
                 index += 1;
             }
@@ -173,13 +175,11 @@ impl View {
                     }
                 }
                 'v' => {
-                    if self.state == State::Summary {
-                        self.state = State::Detail;
-                        self.offset = 0;
-                    } else {
-                        self.state = State::Summary;
-                        self.offset = 0;
+                    match self.state {
+                        State::Summary => self.state = State::Detail,
+                        State::Detail => self.state = State::Summary,
                     }
+                    self.offset = 0;
                 }
                 _ => {
                     self.filter_count = db::count_rows_in_table(&conn, "Beer");
@@ -194,13 +194,6 @@ impl View {
         print!("Search String: '");
         tui_gen::print_color(self.filter.as_str(), "DARKGREEN");
         print!("'");
-        /*
-        if self.state == State::Summary {
-            tui_gen::cmove(0, 5);
-        } else {
-            tui_gen::cmove(0, 4);
-        }
-        */
         match self.state {
             State::Summary => tui_gen::cmove(0, 5),
             State::Detail => tui_gen::cmove(0, 4),
