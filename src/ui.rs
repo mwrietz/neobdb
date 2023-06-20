@@ -39,39 +39,15 @@ impl View {
         record_limit
     }
 
-    pub fn show(self, conn: &Connection) {
+    pub fn show(mut self, conn: &Connection) {
+        tui_gen::cls();
         match self.state {
-            State::Summary => self.summary(conn),
-            State::Detail => self.detail(conn),
-        };
-    }
-
-    pub fn summary(mut self, conn: &Connection) {
-        tui_gen::cls();
-        print_header();
-        print_summary_header();
-
-        self.height = tui_gen::t_height();
-
-        let query = format!(
-            "SELECT * FROM Beer ORDER BY brewer, name LIMIT {} OFFSET {}",
-            self.limit(),
-            self.offset,
-        );
-        let mut beers: Vec<Beer> = Vec::new();
-        db::vec_from_query(conn, query.as_str(), &mut beers);
-
-        let mut index: usize = self.offset;
-        for b in beers {
-            b.print_summary(index);
-            index += 1;
+            State::Summary => {
+                print_header();
+                print_summary_header();
+            }
+            State::Detail => print_header(),
         }
-        println!("");
-    }
-
-    pub fn detail(mut self, conn: &Connection) {
-        tui_gen::cls();
-        print_header();
 
         self.height = tui_gen::t_height();
 
@@ -85,7 +61,10 @@ impl View {
 
         let mut index: usize = self.offset;
         for b in beers {
-            b.print_details(index);
+            match self.state {
+                State::Summary => b.print_summary(index),
+                State::Detail => b.print_details(index),
+            }
             index += 1;
         }
         println!("");

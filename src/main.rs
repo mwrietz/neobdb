@@ -51,7 +51,7 @@ fn main() {
     if args.len() < 2 {
         tui_gen::cls();
         ui::print_header();
-        v.summary(&conn);
+        v.show(&conn);
 
         menu(&conn);
     } else {
@@ -64,13 +64,13 @@ fn main() {
                 v.filter = args[2].clone();
                 v.find(&conn);
             }
-            "-sa" | "--show_all" => v.detail(&conn),
-            "-ss" | "--show_sum" => v.summary(&conn),
+            "-sa" | "--show_all" => v.show(&conn),
+            "-ss" | "--show_sum" => v.show(&conn),
             "-p" | "--pdf" => pdf::create_pdf(&conn),
             "-m" | "--menu" => {
                 tui_gen::cls();
                 ui::print_header();
-                v.summary(&conn);
+                v.show(&conn);
                 menu(&conn);
             }
             _ => {
