@@ -90,9 +90,8 @@ impl View {
         }
         println!("");
     }
-    
-    pub fn find(&mut self, conn: &Connection) {
 
+    pub fn find(&mut self, conn: &Connection) {
         let query = format!(
             "SELECT COUNT(*) FROM Beer
             WHERE name LIKE '%{}%' 
@@ -102,12 +101,7 @@ impl View {
             OR rating LIKE '%{}%' 
             OR notes LIKE '%{}%' 
             ORDER BY brewer, name",
-            self.filter, 
-            self.filter, 
-            self.filter, 
-            self.filter, 
-            self.filter, 
-            self.filter, 
+            self.filter, self.filter, self.filter, self.filter, self.filter, self.filter,
         );
 
         self.filter_count = db::count_rows_in_query(conn, query.as_str());
@@ -133,12 +127,12 @@ impl View {
                 ORDER BY brewer, name
                 LIMIT {}
                 OFFSET {}",
-                self.filter, 
-                self.filter, 
-                self.filter, 
-                self.filter, 
-                self.filter, 
-                self.filter, 
+                self.filter,
+                self.filter,
+                self.filter,
+                self.filter,
+                self.filter,
+                self.filter,
                 self.limit(),
                 self.offset
             );
@@ -171,13 +165,13 @@ impl View {
                     if (self.offset + self.limit()) < self.filter_count {
                         self.offset += self.limit();
                     }
-                },
+                }
                 'k' => {
                     // scroll_up
                     if self.offset >= self.limit() {
                         self.offset -= self.limit();
                     }
-                },
+                }
                 'v' => {
                     if self.state == State::Summary {
                         self.state = State::Detail;
@@ -186,7 +180,7 @@ impl View {
                         self.state = State::Summary;
                         self.offset = 0;
                     }
-                },
+                }
                 _ => {
                     self.filter_count = db::count_rows_in_table(&conn, "Beer");
                     self.filter = String::from(" ");
@@ -221,7 +215,10 @@ pub fn print_header() {
     tui_gen::cmove(50, 1);
     tui_gen::print_color("(", "DARKBLUE");
     tui_gen::print_color(tui_gen::get_prog_name().as_str(), "DARKGREEN");
-    tui_gen::print_color(format!(" v{}", env!("CARGO_PKG_VERSION")).as_str(), "DARKBLUE");
+    tui_gen::print_color(
+        format!(" v{}", env!("CARGO_PKG_VERSION")).as_str(),
+        "DARKBLUE",
+    );
     tui_gen::print_color(")", "DARKBLUE");
     tui_gen::cmove(0, 4);
 }

@@ -22,11 +22,11 @@ impl Beer {
     pub fn print_details(&self, index: usize) {
         // line 1
         let mut buff_tuple: Vec<(String, &str)> = Vec::new();
-        buff_tuple.push((format!("{:7} ", "index:"),     "DARKBLUE"));
-        buff_tuple.push((format!("{:<5} ", index),       "WHITE"));
-        buff_tuple.push((format!("{:5} ", "name:"),      "DARKBLUE"));
-        buff_tuple.push((format!("{:37} ", self.name),   "DARKGREEN"));
-        buff_tuple.push((format!("{:7} ", "brewer:"),    "DARKBLUE"));
+        buff_tuple.push((format!("{:7} ", "index:"), "DARKBLUE"));
+        buff_tuple.push((format!("{:<5} ", index), "WHITE"));
+        buff_tuple.push((format!("{:5} ", "name:"), "DARKBLUE"));
+        buff_tuple.push((format!("{:37} ", self.name), "DARKGREEN"));
+        buff_tuple.push((format!("{:7} ", "brewer:"), "DARKBLUE"));
         buff_tuple.push((format!("{:36} ", self.brewer), "DARKYELLOW"));
         for b in buff_tuple {
             print_color(b.0.as_str(), b.1);
@@ -35,12 +35,12 @@ impl Beer {
 
         // line 2
         let mut buff_tuple: Vec<(String, &str)> = Vec::new();
-        buff_tuple.push((format!("{:7} ", "rating:"),       "DARKBLUE"));
-        buff_tuple.push((format!("{:5} ", self.rating),     "WHITE"));
-        buff_tuple.push((format!("{:5} ", "time:"),         "DARKBLUE"));
+        buff_tuple.push((format!("{:7} ", "rating:"), "DARKBLUE"));
+        buff_tuple.push((format!("{:5} ", self.rating), "WHITE"));
+        buff_tuple.push((format!("{:5} ", "time:"), "DARKBLUE"));
         buff_tuple.push((format!("{:37} ", self.timestamp), "WHITE"));
-        buff_tuple.push((format!("{:7} ", "style:"),        "DARKBLUE"));
-        buff_tuple.push((format!("{:36}", self.style),      "WHITE"));
+        buff_tuple.push((format!("{:7} ", "style:"), "DARKBLUE"));
+        buff_tuple.push((format!("{:36}", self.style), "WHITE"));
         for b in buff_tuple {
             print_color(b.0.as_str(), b.1);
         }
@@ -48,11 +48,11 @@ impl Beer {
 
         // line 3
         let mut buff_tuple: Vec<(String, &str)> = Vec::new();
-        buff_tuple.push((format!("{:7} ", "abv:"),     "DARKBLUE"));
-        buff_tuple.push((format!("{:5} ", self.abv),   "WHITE"));
-        buff_tuple.push((format!("{:5} ", "uuid:"),    "DARKBLUE"));
+        buff_tuple.push((format!("{:7} ", "abv:"), "DARKBLUE"));
+        buff_tuple.push((format!("{:5} ", self.abv), "WHITE"));
+        buff_tuple.push((format!("{:5} ", "uuid:"), "DARKBLUE"));
         buff_tuple.push((format!("{:37} ", self.id.trim_end_matches('\n')), "WHITE"));
-        buff_tuple.push((format!("{:7} ", "notes:"),   "DARKBLUE"));
+        buff_tuple.push((format!("{:7} ", "notes:"), "DARKBLUE"));
         buff_tuple.push((format!("{:36}", self.notes), "WHITE"));
         for b in buff_tuple {
             print_color(b.0.as_str(), b.1);

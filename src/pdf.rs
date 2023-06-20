@@ -1,14 +1,14 @@
 // pdf.rs
 // 20230611
 
-use rusqlite::Connection;
+use crate::db;
 use crate::process;
 use crate::tui_gen;
-use crate::db;
 use crate::ui;
+use rusqlite::Connection;
 use std::fs::File;
-use std::path::Path;
 use std::io::Write;
+use std::path::Path;
 
 use crate::beer_struct::Beer;
 use crate::config;

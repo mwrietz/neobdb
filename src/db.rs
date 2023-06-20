@@ -2,14 +2,14 @@
 // 20220611
 
 use rusqlite::{params, Connection, ToSql};
-use std::process::Command;
 use std::fs;
 use std::path::Path;
+use std::process::Command;
 
 use crate::beer_struct::Beer;
-use crate::ui;
-use crate::tui_inp;
 use crate::tui_gen;
+use crate::tui_inp;
+use crate::ui;
 
 pub fn add(conn: &Connection) {
     tui_gen::cls();
@@ -54,6 +54,7 @@ pub fn remove(conn: &Connection) {
         .unwrap();
 
     // read all data from database into vector of beers
+    // limit/offset
     let query = "SELECT * FROM Beer ORDER BY brewer, name";
     let mut beers: Vec<Beer> = Vec::new();
     vec_from_query(conn, query, &mut beers);
@@ -64,7 +65,6 @@ pub fn remove(conn: &Connection) {
         "Are you sure you want to remove index {}: \"{}\" - (y/n)? ",
         index, b.name
     );
-    //let action = tui_inp::get_string(&prompt);
     let width = prompt.len() + 7;
     let action = tui_inp::dialog_box_get_string(width, 4, "Verify", &prompt);
 
@@ -140,7 +140,7 @@ pub fn count_rows_in_table(conn: &Connection, table_name: &str) -> usize {
     let count: i64 = conn
         .query_row(query.as_str(), params![], |row| row.get(0))
         .expect("count_rows_in_table() error");
-    count as usize 
+    count as usize
 }
 
 pub fn count_rows_in_query(conn: &Connection, query: &str) -> usize {
@@ -154,8 +154,8 @@ fn generate_uuid() -> String {
     let output = Command::new("uuidgen")
         .output()
         .expect("generate_uuid() error");
-    let binding = String::from_utf8_lossy(&output.stdout);
-    let uuid = binding.as_ref() 
+    let uuid = String::from_utf8_lossy(&output.stdout)
+        .to_string()
         .trim_end_matches('\n')
         .to_string();
     uuid
@@ -190,7 +190,7 @@ pub fn create_database_if_not_exist(db_path: &Path) {
     // create data folder if it doesn't exist
     fs::create_dir_all(db_parent_name).expect("cannot create backup folder");
 
-    // create struct for first record in db 
+    // create struct for first record in db
     let beer = Beer {
         id: generate_uuid(),
         timestamp: tui_gen::timestamp(),
@@ -203,8 +203,7 @@ pub fn create_database_if_not_exist(db_path: &Path) {
     };
 
     // create db file
-    let conn = Connection::open(db_path)
-        .expect("cannot create db file");
+    let conn = Connection::open(db_path).expect("cannot create db file");
 
     // create table: Beer
     conn.execute(
@@ -219,7 +218,8 @@ pub fn create_database_if_not_exist(db_path: &Path) {
             notes TEXT NOT NULL
         )",
         [],
-    ).expect("create table error");
+    )
+    .expect("create table error");
 
     // write to database
     let query = "INSERT INTO Beer (id, timestamp, name, brewer, style, abv, rating, notes) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";

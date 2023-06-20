@@ -3,13 +3,13 @@
 
 use rusqlite::Connection;
 use std::env;
-use std::process;
 use std::path::Path;
+use std::process;
 
 mod beer_struct;
 mod config;
-mod pdf;
 mod db;
+mod pdf;
 mod tui_frm;
 mod tui_gen;
 mod tui_inp;
@@ -37,8 +37,7 @@ fn main() {
     }
 
     // connect to database
-    let conn = Connection::open(db_path)
-        .expect("cannot connecte to db");
+    let conn = Connection::open(db_path).expect("cannot connecte to db");
 
     let mut v = ui::View {
         state: ui::State::Summary,
@@ -55,8 +54,7 @@ fn main() {
         v.summary(&conn);
 
         menu(&conn);
-    } 
-    else {
+    } else {
         let cmd = &args[1];
         match &cmd[..] {
             "-a" | "--add" => db::add(&conn),
