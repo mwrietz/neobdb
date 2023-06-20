@@ -194,10 +194,16 @@ impl View {
         print!("Search String: '");
         tui_gen::print_color(self.filter.as_str(), "DARKGREEN");
         print!("'");
+        /*
         if self.state == State::Summary {
             tui_gen::cmove(0, 5);
         } else {
             tui_gen::cmove(0, 4);
+        }
+        */
+        match self.state {
+            State::Summary => tui_gen::cmove(0, 5),
+            State::Detail => tui_gen::cmove(0, 4),
         }
     }
 }
