@@ -1,5 +1,5 @@
-// bdb2 - definitive beer database
-// 20230616
+// neobdb - definitive beer database
+// 20230624
 
 use rusqlite::Connection;
 use std::env;
@@ -19,66 +19,23 @@ mod ui;
 use crate::config::Config;
 
 fn main() {
-    let args: Vec<String> = env::args().collect();
 
     tui_gen::splash_screen(
         "D E F I N I T I V E  B E E R  D A T A B A S E",
         format!("v{}", env!("CARGO_PKG_VERSION")).as_str(),
     );
 
-    // read configuration file and assemble db filepath
     let config: Config = config::read_config_file();
     let db_path = config.data_dir + "/" + config.db_filename.as_str();
     let db_path = Path::new(db_path.as_str());
 
-    // check if db file exists
     if !db_path.exists() {
         db::create_database_if_not_exist(&db_path);
     }
 
-    // connect to database
     let conn = Connection::open(db_path).expect("cannot connecte to db");
 
-    let mut v = ui::View {
-        state: ui::State::Summary,
-        height: tui_gen::t_height(),
-        offset: 0,
-        filter_count: db::count_rows_in_table(&conn, "Beer"),
-        filter: String::from("*"),
-    };
-
-    // check for command line arguments
-    if args.len() < 2 {
-        tui_gen::cls();
-        ui::print_header();
-        v.show(&conn);
-
-        menu(&conn);
-    } else {
-        let cmd = &args[1];
-        match &cmd[..] {
-            "-a" | "--add" => db::add(&conn),
-            "-r" | "--remove" => db::remove(&conn),
-            "-e" | "--edit" => db::edit(&conn),
-            "-f" | "--find" => {
-                v.filter = args[2].clone();
-                v.find(&conn);
-            }
-            "-sa" | "--show_all" => v.show(&conn),
-            "-ss" | "--show_sum" => v.show(&conn),
-            "-p" | "--pdf" => pdf::create_pdf(&conn),
-            "-m" | "--menu" => {
-                tui_gen::cls();
-                ui::print_header();
-                v.show(&conn);
-                menu(&conn);
-            }
-            _ => {
-                ui::usage();
-                quit();
-            }
-        }
-    }
+    menu(&conn);
 }
 
 fn menu(conn: &Connection) {
@@ -89,6 +46,10 @@ fn menu(conn: &Connection) {
         filter_count: db::count_rows_in_table(conn, "Beer"),
         filter: String::from("*"),
     };
+    tui_gen::cls();
+    ui::print_header();
+    v.clone().show(&conn);
+
     let menu_items = vec![
         ("j", "Scroll_DN"),
         ("k", "Scroll_UP"),
@@ -105,14 +66,12 @@ fn menu(conn: &Connection) {
         let selection = tui_menu::menu_horiz(&menu_items);
         match selection {
             'j' => {
-                // scroll_dn if not last page
                 if (v.offset + v.limit()) < v.filter_count {
                     v.offset += v.limit();
                 }
                 v.clone().show(&conn);
             }
             'k' => {
-                // scroll_up if not first page
                 if v.offset >= v.limit() {
                     v.offset -= v.limit();
                 }
@@ -146,13 +105,9 @@ fn menu(conn: &Connection) {
             }
             'q' => {
                 tui_gen::cls();
-                quit();
+                process::exit(1);
             }
             _ => ui::usage(),
         }
     }
-}
-
-fn quit() {
-    process::exit(1);
 }
