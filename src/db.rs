@@ -4,7 +4,7 @@
 use rusqlite::{params, Connection, ToSql};
 use std::fs;
 use std::path::Path;
-use std::process::Command;
+//use std::process::Command;
 
 use crate::beer_struct::Beer;
 use crate::tui_gen;
@@ -149,6 +149,7 @@ pub fn count_rows_in_query(conn: &Connection, query: &str) -> usize {
 }
 
 fn generate_uuid() -> String {
+    /*
     let output = Command::new("uuidgen")
         .output()
         .expect("generate_uuid() error");
@@ -156,6 +157,9 @@ fn generate_uuid() -> String {
         .to_string()
         .trim_end_matches('\n')
         .to_string();
+    */
+    let uuid = uuid::Uuid::new_v4().to_string();
+
     uuid
 }
 
