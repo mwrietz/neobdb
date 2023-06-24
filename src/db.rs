@@ -4,7 +4,6 @@
 use rusqlite::{params, Connection, ToSql};
 use std::fs;
 use std::path::Path;
-//use std::process::Command;
 
 use crate::beer_struct::Beer;
 use crate::tui_gen;
@@ -19,7 +18,7 @@ pub fn add(conn: &Connection) {
 
     // setup Beer struct
     let beer = Beer {
-        id: generate_uuid(),
+        id: uuid::Uuid::new_v4().to_string(),
         timestamp: tui_gen::timestamp(),
         name: tui_inp::get_string("Enter name: "),
         brewer: tui_inp::get_string("Enter brewer: "),
@@ -48,7 +47,7 @@ pub fn add(conn: &Connection) {
 }
 
 pub fn remove(conn: &Connection) {
-    // verify if index within displayed page
+    // todo: verify if index within displayed page
     let index = tui_inp::dialog_box_get_string(42, 4, "Remove", "Enter index of item to remove: ")
         .parse::<usize>()
         .unwrap();
@@ -148,21 +147,6 @@ pub fn count_rows_in_query(conn: &Connection, query: &str) -> usize {
     count as usize
 }
 
-fn generate_uuid() -> String {
-    /*
-    let output = Command::new("uuidgen")
-        .output()
-        .expect("generate_uuid() error");
-    let uuid = String::from_utf8_lossy(&output.stdout)
-        .to_string()
-        .trim_end_matches('\n')
-        .to_string();
-    */
-    let uuid = uuid::Uuid::new_v4().to_string();
-
-    uuid
-}
-
 pub fn vec_from_query(conn: &Connection, query: &str) -> Vec<Beer> {
     let mut stmt = conn.prepare(query).expect("vec_from_query() error 1");
 
@@ -196,7 +180,7 @@ pub fn create_database_if_not_exist(db_path: &Path) {
 
     // create struct for first record in db
     let beer = Beer {
-        id: generate_uuid(),
+        id: uuid::Uuid::new_v4().to_string(),
         timestamp: tui_gen::timestamp(),
         name: "Budweiser".to_string(),
         brewer: "Anheuser-Busch".to_string(),
