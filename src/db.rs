@@ -9,6 +9,7 @@ use crate::beer_struct::Beer;
 use crate::tui_gen;
 use crate::tui_inp;
 use crate::ui;
+use crate::ui::View;
 
 pub fn add(conn: &Connection) {
     tui_gen::cls();
@@ -46,18 +47,20 @@ pub fn add(conn: &Connection) {
     .expect("add execute error");
 }
 
-pub fn remove(conn: &Connection) {
-    // todo: verify if index within displayed page
+pub fn remove(conn: &Connection, view: &View) {
     let index = tui_inp::dialog_box_get_string(42, 4, "Remove", "Enter index of item to remove: ")
         .parse::<usize>()
         .unwrap();
 
-    // read all data from database into vector of beers
-    // limit/offset
-    let query = "SELECT * FROM Beer ORDER BY brewer, name";
-    let beers = vec_from_query(conn, query);
+    let query = format!(
+        "SELECT * FROM Beer ORDER BY brewer, name LIMIT {} OFFSET {}",
+        view.limit(),
+        view.offset,
+    );
 
-    let b = beers.get(index).expect("error");
+    let beers = vec_from_query(conn, query.as_str());
+
+    let b = beers.get(index - view.offset).expect("error");
 
     let prompt = format!(
         "Are you sure you want to remove index {}: \"{}\" - (y/n)? ",
@@ -73,18 +76,22 @@ pub fn remove(conn: &Connection) {
     }
 }
 
-pub fn edit(conn: &Connection) {
-    // make sure index on displayed page
+pub fn edit(conn: &Connection, view: &View) {
     let index = tui_inp::dialog_box_get_string(42, 4, "Edit", "Enter index of item to edit: ")
         .parse::<usize>()
         .unwrap();
 
-    let query = "SELECT * FROM Beer ORDER BY brewer, name";
-    let beers = vec_from_query(conn, query);
+    //let query = "SELECT * FROM Beer ORDER BY brewer, name";
+    let query = format!(
+        "SELECT * FROM Beer ORDER BY brewer, name LIMIT {} OFFSET {}",
+        view.limit(),
+        view.offset,
+    );
+    let beers = vec_from_query(conn, query.as_str());
 
     let prompt = format!(
         "Are you sure you want to edit index {}: \"{}\" - (y/n)? ",
-        index, beers[index].name
+        index, beers[index - view.offset].name
     );
     let width = prompt.len() + 7;
     let action = tui_inp::dialog_box_get_string(width, 4, "Verify", &prompt);
@@ -94,19 +101,19 @@ pub fn edit(conn: &Connection) {
         ui::print_header();
 
         println!("");
-        beers[index].print_details(index);
+        beers[index - view.offset].print_details(index);
         println!("");
 
         // prompt for revised data and setup new beer struct
         let b = Beer {
-            id: beers[index].id.clone(),
+            id: beers[index - view.offset].id.clone(),
             timestamp: tui_gen::timestamp(),
-            name: tui_inp::get_string_default("Enter new name", &beers[index].name),
-            brewer: tui_inp::get_string_default("Enter new brewer", &beers[index].brewer),
-            style: tui_inp::get_string_default("Enter new style", &beers[index].style),
-            abv: tui_inp::get_string_default("Enter new abv", &beers[index].abv),
-            rating: tui_inp::get_string_default("Enter new rating", &beers[index].rating),
-            notes: tui_inp::get_string_default("Enter new notes", &beers[index].notes),
+            name: tui_inp::get_string_default("Enter new name", &beers[index - view.offset].name),
+            brewer: tui_inp::get_string_default("Enter new brewer", &beers[index - view.offset].brewer),
+            style: tui_inp::get_string_default("Enter new style", &beers[index - view.offset].style),
+            abv: tui_inp::get_string_default("Enter new abv", &beers[index - view.offset].abv),
+            rating: tui_inp::get_string_default("Enter new rating", &beers[index - view.offset].rating),
+            notes: tui_inp::get_string_default("Enter new notes", &beers[index - view.offset].notes),
         };
 
         // update record

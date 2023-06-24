@@ -90,11 +90,12 @@ fn menu(conn: &Connection) {
                 v.clone().show(&conn);
             }
             'r' => {
-                db::remove(&conn);
+                //db::remove(&conn);
+                db::remove(&conn, &v);
                 v.clone().show(&conn);
             }
             'e' => {
-                db::edit(&conn);
+                db::edit(&conn, &v);
                 v.clone().show(&conn);
             }
             'p' => pdf::create_pdf(&conn),
