@@ -1,5 +1,5 @@
 // bdb - definitive beer database
-// 20220611
+// 20220623
 
 use rusqlite::{params, Connection, ToSql};
 use std::fs;
@@ -56,8 +56,7 @@ pub fn remove(conn: &Connection) {
     // read all data from database into vector of beers
     // limit/offset
     let query = "SELECT * FROM Beer ORDER BY brewer, name";
-    let mut beers: Vec<Beer> = Vec::new();
-    vec_from_query(conn, query, &mut beers);
+    let beers = vec_from_query(conn, query);
 
     let b = beers.get(index).expect("error");
 
@@ -82,8 +81,7 @@ pub fn edit(conn: &Connection) {
         .unwrap();
 
     let query = "SELECT * FROM Beer ORDER BY brewer, name";
-    let mut beers: Vec<Beer> = Vec::new();
-    vec_from_query(conn, query, &mut beers);
+    let beers = vec_from_query(conn, query);
 
     let prompt = format!(
         "Are you sure you want to edit index {}: \"{}\" - (y/n)? ",
@@ -161,7 +159,7 @@ fn generate_uuid() -> String {
     uuid
 }
 
-pub fn vec_from_query(conn: &Connection, query: &str, beers: &mut Vec<Beer>) {
+pub fn vec_from_query(conn: &Connection, query: &str) -> Vec<Beer> {
     let mut stmt = conn.prepare(query).expect("vec_from_query() error 1");
 
     let beer_iter = stmt
@@ -179,9 +177,11 @@ pub fn vec_from_query(conn: &Connection, query: &str, beers: &mut Vec<Beer>) {
         })
         .expect("vec_from_query() error 2");
 
+    let mut beers: Vec<Beer> = Vec::new();
     for beer in beer_iter {
         beers.push(beer.unwrap());
     }
+    beers
 }
 
 pub fn create_database_if_not_exist(db_path: &Path) {

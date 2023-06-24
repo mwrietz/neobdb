@@ -1,5 +1,5 @@
 // pdf.rs
-// 20230611
+// 20230623
 
 use crate::db;
 use crate::process;
@@ -25,15 +25,14 @@ pub fn create_pdf(conn: &Connection) {
     ui::print_header();
 
     let query = "SELECT * FROM Beer ORDER BY brewer, name";
-    let mut beers: Vec<Beer> = Vec::new();
-    db::vec_from_query(conn, query, &mut beers);
+    let beers = db::vec_from_query(conn, query);
 
-    create_md_file(&md_path, &mut beers);
+    create_md_file(&md_path, beers);
     md_to_pdf(&md_path, &pdf_path);
     println!("");
 }
 
-fn create_md_file(md_path: &Path, beers: &mut Vec<Beer>) {
+fn create_md_file(md_path: &Path, beers: Vec<Beer>) {
     println!("creating {}...", md_path.display());
     let mut output = File::create(md_path).expect("error opening file");
     output.write(b"---\n").expect("write error");
@@ -69,4 +68,5 @@ fn md_to_pdf(md_path: &Path, pdf_path: &Path) {
         .arg(pdf_path)
         .spawn()
         .expect("pandoc pdf failed");
+    println!("complete!");
 }

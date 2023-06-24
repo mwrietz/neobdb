@@ -1,8 +1,7 @@
-// 20230616
+// 20230623
 
 use rusqlite::Connection;
 
-use crate::beer_struct::Beer;
 use crate::db;
 use crate::tui_gen;
 use crate::tui_menu;
@@ -56,8 +55,7 @@ impl View {
             self.limit(),
             self.offset,
         );
-        let mut beers: Vec<Beer> = Vec::new();
-        db::vec_from_query(conn, query.as_str(), &mut beers);
+        let beers = db::vec_from_query(conn, query.as_str());
 
         let mut index: usize = self.offset;
         for b in beers {
@@ -116,8 +114,7 @@ impl View {
                 self.offset
             );
 
-            let mut beers: Vec<Beer> = Vec::new();
-            db::vec_from_query(conn, query.as_str(), &mut beers);
+            let beers = db::vec_from_query(conn, query.as_str());
 
             tui_gen::cls();
             match self.state {
