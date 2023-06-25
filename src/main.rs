@@ -43,7 +43,6 @@ fn menu(conn: &Connection) {
         state: ui::State::Summary,
         height: tui_gen::t_height(),
         offset: 0,
-        //filter_count: db::count_rows_in_table(conn, "Beer"),
         filter: String::from(""),
     };
     tui_gen::cls();
@@ -83,7 +82,6 @@ fn menu(conn: &Connection) {
             }
             'c' => {
                 view.filter = "".to_string();
-                //view.filter_count = db::count_rows_in_table(conn, "Beer");
                 view.offset = 0;
             }
             'e' => {
@@ -118,7 +116,7 @@ fn menu(conn: &Connection) {
                 }
                 view.offset = 0;
             }
-            _ => ui::usage(),
+            _ => process::exit(1),
         }
         view.clone().show(&conn);
     }

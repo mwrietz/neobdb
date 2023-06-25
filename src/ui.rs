@@ -16,7 +16,6 @@ pub struct View {
     pub state: State,
     pub height: usize,
     pub offset: usize,
-    //pub filter_count: usize,
     pub filter: String,
 }
 
@@ -105,24 +104,4 @@ pub fn print_header() {
     );
     tui_gen::print_color(")", "DARKBLUE");
     tui_gen::cmove(0, 4);
-}
-
-pub fn usage() {
-    tui_gen::cls();
-    print_header();
-    println!("Invalid arguments provided...");
-    println!("");
-    println!("USAGE:");
-    println!("    ./bdb [OPTION]");
-    println!("");
-    println!("OPTIONS:");
-    println!("    -a,  --add                    Add new record to database");
-    println!("    -r,  --remove                 Remove record from database");
-    println!("    -e,  --edit                   Edit existing record");
-    println!("    -f,  --find <SEARCHSTRING>    Find records with searchstring (eg. ./bdb -f searchstring)");
-    println!("    -sa, --show_all               Show all records in database (detailed)");
-    println!("    -ss, --show_sum               Show all records in database (summary)");
-    println!("    -p,  --pdf                    Create a pdf of database");
-    println!("    -m,  --menu                   Display menu");
-    println!("");
 }

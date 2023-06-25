@@ -1,7 +1,6 @@
 // bdb - definitive beer database
 // 20220623
 
-//use rusqlite::{params, Connection, ToSql};
 use rusqlite::{Connection, ToSql};
 use std::fs;
 use std::path::Path;
@@ -105,37 +104,15 @@ pub fn remove(conn: &Connection, view: &View) {
     let index = tui_inp::dialog_box_get_string(42, 4, "Remove", "Enter index of item to remove: ")
         .parse::<usize>()
         .unwrap();
-
-    /*
-    let query = format!(
-        "SELECT * FROM Beer ORDER BY brewer, name LIMIT {} OFFSET {}",
-        view.limit(),
-        view.offset,
-    );
-    */
     let query = query_for_display(view);
-
     let beers = vec_from_query(conn, query.as_str());
-
-    //let b = beers.get(index - view.offset).expect("error");
-
-    /*
-    let prompt = format!(
-        "Are you sure you want to remove index {}: \"{}\" - (y/n)? ",
-        index, b.name
-    );
-    */
     let prompt = format!(
         "Are you sure you want to remove index {}: \"{}\" - (y/n)? ",
         index, beers[index - view.offset].name 
     );
-
-
     let width = prompt.len() + 7;
     let action = tui_inp::dialog_box_get_string(width, 4, "Verify", &prompt);
-
     if action.eq("y") {
-        //let query = format!("DELETE FROM Beer WHERE id = '{}'", b.id);
         let query = format!("DELETE FROM Beer WHERE id = '{}'", beers[index - view.offset].id);
         conn.execute(query.as_str(), [])
             .expect("remove() execute error");
@@ -146,25 +123,14 @@ pub fn edit(conn: &Connection, view: &View) {
     let index = tui_inp::dialog_box_get_string(42, 4, "Edit", "Enter index of item to edit: ")
         .parse::<usize>()
         .unwrap();
-
-    /*
-    let query = format!(
-        "SELECT * FROM Beer ORDER BY brewer, name LIMIT {} OFFSET {}",
-        view.limit(),
-        view.offset,
-    );
-    */
     let query = query_for_display(view);
-
     let beers = vec_from_query(conn, query.as_str());
-
     let prompt = format!(
         "Are you sure you want to edit index {}: \"{}\" - (y/n)? ",
         index, beers[index - view.offset].name
     );
     let width = prompt.len() + 7;
     let action = tui_inp::dialog_box_get_string(width, 4, "Verify", &prompt);
-
     if action.eq("y") {
         tui_gen::cls();
         ui::print_header();
@@ -173,7 +139,6 @@ pub fn edit(conn: &Connection, view: &View) {
         beers[index - view.offset].print_details(index);
         println!("");
 
-        // prompt for revised data and setup new beer struct
         let b = Beer {
             id: beers[index - view.offset].id.clone(),
             timestamp: tui_gen::timestamp(),
@@ -207,23 +172,7 @@ pub fn edit(conn: &Connection, view: &View) {
         b.print_details(index);
     }
 }
-/*
-pub fn count_rows_in_table(conn: &Connection, table_name: &str) -> usize {
-    let query = format!("SELECT COUNT(*) FROM {}", table_name);
-    let count: i64 = conn
-        .query_row(query.as_str(), params![], |row| row.get(0))
-        .expect("count_rows_in_table() error");
-    count as usize
-}
-*/
-/*
-pub fn count_rows_in_query(conn: &Connection, query: &str) -> usize {
-    let count: i64 = conn
-        .query_row(query, params![], |row| row.get(0))
-        .expect("count_rows_in_query() error");
-    count as usize
-}
-*/
+
 pub fn vec_from_query(conn: &Connection, query: &str) -> Vec<Beer> {
     let mut stmt = conn.prepare(query).expect("vec_from_query() error 1");
 
