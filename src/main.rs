@@ -101,7 +101,10 @@ fn menu(conn: &Connection) {
                     view.offset -= view.limit();
                 }
             }
-            'p' => pdf::create_pdf(&conn),
+            'p' => {
+                pdf::create_pdf(&conn);
+                tui_gen::pause();
+            }
             'q' => {
                 tui_gen::cls();
                 process::exit(1);

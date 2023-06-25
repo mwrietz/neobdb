@@ -24,7 +24,6 @@ pub fn create_pdf(conn: &Connection) {
     tui_gen::cls();
     ui::print_header();
 
-    //let query = "select * from beer order by brewer, name";
     let query = db::query_full();
     let beers = db::vec_from_query(conn, query.as_str());
 
