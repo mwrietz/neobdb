@@ -1,7 +1,8 @@
 // bdb - definitive beer database
 // 20220623
 
-use rusqlite::{params, Connection, ToSql};
+//use rusqlite::{params, Connection, ToSql};
+use rusqlite::{Connection, ToSql};
 use std::fs;
 use std::path::Path;
 
@@ -10,6 +11,59 @@ use crate::tui_gen;
 use crate::tui_inp;
 use crate::ui;
 use crate::ui::View;
+
+pub fn query_full() -> String {
+    let query = format!("SELECT * FROM Beer ORDER BY brewer, name");
+    query
+}
+
+pub fn query_filtered(view: &View) -> String {
+    let query = match view.filter.len() {
+        0 => query_full(),
+        _ => format!(
+                "SELECT * FROM Beer
+                WHERE name LIKE '%{}%' 
+                OR brewer LIKE '%{}%' 
+                OR style LIKE '%{}%' 
+                OR abv LIKE '%{}%' 
+                OR rating LIKE '%{}%' 
+                OR notes LIKE '%{}%' 
+                ORDER BY brewer, name",
+                view.filter, view.filter, view.filter, view.filter, view.filter, view.filter,
+            ),
+    };
+    query
+}
+
+pub fn query_for_display(view: &View) -> String {
+    let query = match view.filter.len() {
+        0 => { 
+            format!("SELECT * FROM Beer ORDER BY brewer, name LIMIT {} OFFSET {}",
+            view.limit(),
+            view.offset)
+        },
+        _ => { 
+            format!("SELECT * FROM Beer WHERE name LIKE '%{}%' 
+                    OR brewer LIKE '%{}%' 
+                    OR style LIKE '%{}%' 
+                    OR abv LIKE '%{}%' 
+                    OR rating LIKE '%{}%' 
+                    OR notes LIKE '%{}%' 
+                    ORDER BY brewer, name
+                    LIMIT {}
+                    OFFSET {}",
+                    view.filter,
+                    view.filter,
+                    view.filter,
+                    view.filter,
+                    view.filter,
+                    view.filter,
+                    view.limit(),
+                    view.offset)
+        },
+    };
+    query
+}
 
 pub fn add(conn: &Connection) {
     tui_gen::cls();
@@ -52,25 +106,37 @@ pub fn remove(conn: &Connection, view: &View) {
         .parse::<usize>()
         .unwrap();
 
+    /*
     let query = format!(
         "SELECT * FROM Beer ORDER BY brewer, name LIMIT {} OFFSET {}",
         view.limit(),
         view.offset,
     );
+    */
+    let query = query_for_display(view);
 
     let beers = vec_from_query(conn, query.as_str());
 
-    let b = beers.get(index - view.offset).expect("error");
+    //let b = beers.get(index - view.offset).expect("error");
 
+    /*
     let prompt = format!(
         "Are you sure you want to remove index {}: \"{}\" - (y/n)? ",
         index, b.name
     );
+    */
+    let prompt = format!(
+        "Are you sure you want to remove index {}: \"{}\" - (y/n)? ",
+        index, beers[index - view.offset].name 
+    );
+
+
     let width = prompt.len() + 7;
     let action = tui_inp::dialog_box_get_string(width, 4, "Verify", &prompt);
 
     if action.eq("y") {
-        let query = format!("DELETE FROM Beer WHERE id = '{}'", b.id);
+        //let query = format!("DELETE FROM Beer WHERE id = '{}'", b.id);
+        let query = format!("DELETE FROM Beer WHERE id = '{}'", beers[index - view.offset].id);
         conn.execute(query.as_str(), [])
             .expect("remove() execute error");
     }
@@ -81,12 +147,15 @@ pub fn edit(conn: &Connection, view: &View) {
         .parse::<usize>()
         .unwrap();
 
-    //let query = "SELECT * FROM Beer ORDER BY brewer, name";
+    /*
     let query = format!(
         "SELECT * FROM Beer ORDER BY brewer, name LIMIT {} OFFSET {}",
         view.limit(),
         view.offset,
     );
+    */
+    let query = query_for_display(view);
+
     let beers = vec_from_query(conn, query.as_str());
 
     let prompt = format!(
@@ -138,7 +207,7 @@ pub fn edit(conn: &Connection, view: &View) {
         b.print_details(index);
     }
 }
-
+/*
 pub fn count_rows_in_table(conn: &Connection, table_name: &str) -> usize {
     let query = format!("SELECT COUNT(*) FROM {}", table_name);
     let count: i64 = conn
@@ -146,14 +215,15 @@ pub fn count_rows_in_table(conn: &Connection, table_name: &str) -> usize {
         .expect("count_rows_in_table() error");
     count as usize
 }
-
+*/
+/*
 pub fn count_rows_in_query(conn: &Connection, query: &str) -> usize {
     let count: i64 = conn
         .query_row(query, params![], |row| row.get(0))
         .expect("count_rows_in_query() error");
     count as usize
 }
-
+*/
 pub fn vec_from_query(conn: &Connection, query: &str) -> Vec<Beer> {
     let mut stmt = conn.prepare(query).expect("vec_from_query() error 1");
 

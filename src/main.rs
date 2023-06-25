@@ -33,24 +33,24 @@ fn main() {
         db::create_database_if_not_exist(&db_path);
     }
 
-    let conn = Connection::open(db_path).expect("cannot connecte to db");
+    let conn = Connection::open(db_path).expect("cannot connect to db");
 
     menu(&conn);
 }
 
 fn menu(conn: &Connection) {
-    let mut v = ui::View {
+    let mut view = ui::View {
         state: ui::State::Summary,
         height: tui_gen::t_height(),
         offset: 0,
-        filter_count: db::count_rows_in_table(conn, "Beer"),
-        filter: String::from("*"),
+        //filter_count: db::count_rows_in_table(conn, "Beer"),
+        filter: String::from(""),
     };
     tui_gen::cls();
     ui::print_header();
-    v.clone().show(&conn);
+    view.clone().show(&conn);
 
-    let menu_items = vec![
+    let full_menu_items = vec![
         ("j", "Scroll_DN"),
         ("k", "Scroll_UP"),
         ("v", "Detail/Summary"),
@@ -62,53 +62,64 @@ fn menu(conn: &Connection) {
         ("q", "Quit"),
     ];
 
+    let filter_menu_items = vec![
+        ("j", "Scroll_DN"),
+        ("k", "Scroll_UP"),
+        ("v", "Detail/Summary"),
+        ("r", "Remove"),
+        ("e", "Edit"),
+        ("c", "Clear search"),
+    ];
+
     loop {
-        let selection = tui_menu::menu_horiz(&menu_items);
+        let selection = match view.filter.len() {
+            0 => tui_menu::menu_horiz(&full_menu_items),
+            _ => tui_menu::menu_horiz(&filter_menu_items),
+        };
+
         match selection {
-            'j' => {
-                if (v.offset + v.limit()) < v.filter_count {
-                    v.offset += v.limit();
-                }
-                v.clone().show(&conn);
-            }
-            'k' => {
-                if v.offset >= v.limit() {
-                    v.offset -= v.limit();
-                }
-                v.clone().show(&conn);
-            }
-            'v' => {
-                match v.state {
-                    ui::State::Summary => v.state = ui::State::Detail,
-                    ui::State::Detail => v.state = ui::State::Summary,
-                }
-                v.offset = 0;
-                v.clone().show(&conn);
-            }
             'a' => {
                 db::add(&conn);
-                v.clone().show(&conn);
             }
-            'r' => {
-                //db::remove(&conn);
-                db::remove(&conn, &v);
-                v.clone().show(&conn);
+            'c' => {
+                view.filter = "".to_string();
+                //view.filter_count = db::count_rows_in_table(conn, "Beer");
+                view.offset = 0;
             }
             'e' => {
-                db::edit(&conn, &v);
-                v.clone().show(&conn);
+                db::edit(&conn, &view);
+            }
+            'f' => {
+                view.filter = tui_inp::dialog_box_get_string(50, 4, "Find", "Enter search string: ");
+                view.offset = 0;
+            }
+            'j' => {
+                if (view.offset + view.limit()) < view.clone().filter_count(conn) {
+                    view.offset += view.limit();
+                }
+            }
+            'k' => {
+                if view.offset >= view.limit() {
+                    view.offset -= view.limit();
+                }
             }
             'p' => pdf::create_pdf(&conn),
-            'f' => {
-                v.filter = tui_inp::dialog_box_get_string(50, 4, "Find", "Enter search string: ");
-                v.find(&conn);
-                v.clone().show(&conn);
-            }
             'q' => {
                 tui_gen::cls();
                 process::exit(1);
             }
+            'r' => {
+                db::remove(&conn, &view);
+            }
+            'v' => {
+                match view.state {
+                    ui::State::Summary => view.state = ui::State::Detail,
+                    ui::State::Detail => view.state = ui::State::Summary,
+                }
+                view.offset = 0;
+            }
             _ => ui::usage(),
         }
+        view.clone().show(&conn);
     }
 }

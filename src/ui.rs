@@ -4,7 +4,6 @@ use rusqlite::Connection;
 
 use crate::db;
 use crate::tui_gen;
-use crate::tui_menu;
 
 #[derive(PartialEq, Copy, Clone)]
 pub enum State {
@@ -17,11 +16,20 @@ pub struct View {
     pub state: State,
     pub height: usize,
     pub offset: usize,
-    pub filter_count: usize,
+    //pub filter_count: usize,
     pub filter: String,
 }
 
 impl View {
+    pub fn filter_count(self, conn: &Connection) -> usize {
+        let query = match self.filter.len() {
+            0 => db::query_full(),
+            _ => db::query_filtered(&self),
+        };
+        let beers = db::vec_from_query(conn, query.as_str());
+        beers.len()
+    }
+
     pub fn limit(&self) -> usize {
         let lines_per_record: usize;
         let record_limit: usize;
@@ -40,6 +48,7 @@ impl View {
 
     pub fn show(mut self, conn: &Connection) {
         tui_gen::cls();
+        self.height = tui_gen::t_height();
         match self.state {
             State::Summary => {
                 print_header();
@@ -48,15 +57,8 @@ impl View {
             State::Detail => print_header(),
         }
 
-        self.height = tui_gen::t_height();
-
-        let query = format!(
-            "SELECT * FROM Beer ORDER BY brewer, name LIMIT {} OFFSET {}",
-            self.limit(),
-            self.offset,
-        );
+        let query = db::query_for_display(&self);
         let beers = db::vec_from_query(conn, query.as_str());
-
         let mut index: usize = self.offset;
         for b in beers {
             match self.state {
@@ -66,106 +68,13 @@ impl View {
             index += 1;
         }
         println!("");
-    }
 
-    pub fn find(&mut self, conn: &Connection) {
-        let query = format!(
-            "SELECT COUNT(*) FROM Beer
-            WHERE name LIKE '%{}%' 
-            OR brewer LIKE '%{}%' 
-            OR style LIKE '%{}%' 
-            OR abv LIKE '%{}%' 
-            OR rating LIKE '%{}%' 
-            OR notes LIKE '%{}%' 
-            ORDER BY brewer, name",
-            self.filter, self.filter, self.filter, self.filter, self.filter, self.filter,
-        );
-
-        self.filter_count = db::count_rows_in_query(conn, query.as_str());
-
-        let find_menu_items = vec![
-            ("j", "Scroll_DN"),
-            ("k", "Scroll_UP"),
-            ("v", "Detail/Summary"),
-            ("c", "Clear Search"),
-        ];
-
-        self.offset = 0;
-
-        loop {
-            let query = format!(
-                "SELECT * FROM Beer
-                WHERE name LIKE '%{}%' 
-                OR brewer LIKE '%{}%' 
-                OR style LIKE '%{}%' 
-                OR abv LIKE '%{}%' 
-                OR rating LIKE '%{}%' 
-                OR notes LIKE '%{}%' 
-                ORDER BY brewer, name
-                LIMIT {}
-                OFFSET {}",
-                self.filter,
-                self.filter,
-                self.filter,
-                self.filter,
-                self.filter,
-                self.filter,
-                self.limit(),
-                self.offset
-            );
-
-            let beers = db::vec_from_query(conn, query.as_str());
-
-            tui_gen::cls();
-            match self.state {
-                State::Summary => {
-                    print_header();
-                    print_summary_header();
-                }
-                State::Detail => print_header(),
-            }
+        if self.filter.len() > 0 {
             self.display_filter();
-
-            let mut index: usize = self.offset;
-            for b in beers {
-                match self.state {
-                    State::Summary => b.print_summary(index),
-                    State::Detail => b.print_details(index),
-                }
-                index += 1;
-            }
-            println!("");
-
-            let selection = tui_menu::menu_horiz(&find_menu_items);
-            match selection {
-                'j' => {
-                    // scroll_dn if not last page
-                    if (self.offset + self.limit()) < self.filter_count {
-                        self.offset += self.limit();
-                    }
-                }
-                'k' => {
-                    // scroll_up
-                    if self.offset >= self.limit() {
-                        self.offset -= self.limit();
-                    }
-                }
-                'v' => {
-                    match self.state {
-                        State::Summary => self.state = State::Detail,
-                        State::Detail => self.state = State::Summary,
-                    }
-                    self.offset = 0;
-                }
-                _ => {
-                    self.filter_count = db::count_rows_in_table(&conn, "Beer");
-                    self.filter = String::from(" ");
-                    break;
-                }
-            }
         }
     }
-    fn display_filter(&self) {
+
+fn display_filter(&self) {
         tui_gen::cmove(72, 1);
         print!("Search String: '");
         tui_gen::print_color(self.filter.as_str(), "DARKGREEN");
