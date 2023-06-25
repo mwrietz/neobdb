@@ -73,7 +73,7 @@ impl View {
         }
     }
 
-fn display_filter(&self) {
+    fn display_filter(&self) {
         tui_gen::cmove(72, 1);
         print!("Search String: '");
         tui_gen::print_color(self.filter.as_str(), "DARKGREEN");

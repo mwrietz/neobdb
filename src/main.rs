@@ -19,7 +19,6 @@ mod ui;
 use crate::config::Config;
 
 fn main() {
-
     tui_gen::splash_screen(
         "D E F I N I T I V E  B E E R  D A T A B A S E",
         format!("v{}", env!("CARGO_PKG_VERSION")).as_str(),
@@ -88,7 +87,8 @@ fn menu(conn: &Connection) {
                 db::edit(&conn, &view);
             }
             'f' => {
-                view.filter = tui_inp::dialog_box_get_string(50, 4, "Find", "Enter search string: ");
+                view.filter =
+                    tui_inp::dialog_box_get_string(50, 4, "Find", "Enter search string: ");
                 view.offset = 0;
             }
             'j' => {

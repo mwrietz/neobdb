@@ -20,7 +20,7 @@ pub fn query_filtered(view: &View) -> String {
     let query = match view.filter.len() {
         0 => query_full(),
         _ => format!(
-                "SELECT * FROM Beer
+            "SELECT * FROM Beer
                 WHERE name LIKE '%{}%' 
                 OR brewer LIKE '%{}%' 
                 OR style LIKE '%{}%' 
@@ -28,21 +28,24 @@ pub fn query_filtered(view: &View) -> String {
                 OR rating LIKE '%{}%' 
                 OR notes LIKE '%{}%' 
                 ORDER BY brewer, name",
-                view.filter, view.filter, view.filter, view.filter, view.filter, view.filter,
-            ),
+            view.filter, view.filter, view.filter, view.filter, view.filter, view.filter,
+        ),
     };
     query
 }
 
 pub fn query_for_display(view: &View) -> String {
     let query = match view.filter.len() {
-        0 => { 
-            format!("SELECT * FROM Beer ORDER BY brewer, name LIMIT {} OFFSET {}",
-            view.limit(),
-            view.offset)
-        },
-        _ => { 
-            format!("SELECT * FROM Beer WHERE name LIKE '%{}%' 
+        0 => {
+            format!(
+                "SELECT * FROM Beer ORDER BY brewer, name LIMIT {} OFFSET {}",
+                view.limit(),
+                view.offset
+            )
+        }
+        _ => {
+            format!(
+                "SELECT * FROM Beer WHERE name LIKE '%{}%' 
                     OR brewer LIKE '%{}%' 
                     OR style LIKE '%{}%' 
                     OR abv LIKE '%{}%' 
@@ -51,15 +54,16 @@ pub fn query_for_display(view: &View) -> String {
                     ORDER BY brewer, name
                     LIMIT {}
                     OFFSET {}",
-                    view.filter,
-                    view.filter,
-                    view.filter,
-                    view.filter,
-                    view.filter,
-                    view.filter,
-                    view.limit(),
-                    view.offset)
-        },
+                view.filter,
+                view.filter,
+                view.filter,
+                view.filter,
+                view.filter,
+                view.filter,
+                view.limit(),
+                view.offset
+            )
+        }
     };
     query
 }
@@ -108,12 +112,16 @@ pub fn remove(conn: &Connection, view: &View) {
     let beers = vec_from_query(conn, query.as_str());
     let prompt = format!(
         "Are you sure you want to remove index {}: \"{}\" - (y/n)? ",
-        index, beers[index - view.offset].name 
+        index,
+        beers[index - view.offset].name
     );
     let width = prompt.len() + 7;
     let action = tui_inp::dialog_box_get_string(width, 4, "Verify", &prompt);
     if action.eq("y") {
-        let query = format!("DELETE FROM Beer WHERE id = '{}'", beers[index - view.offset].id);
+        let query = format!(
+            "DELETE FROM Beer WHERE id = '{}'",
+            beers[index - view.offset].id
+        );
         conn.execute(query.as_str(), [])
             .expect("remove() execute error");
     }
@@ -127,7 +135,8 @@ pub fn edit(conn: &Connection, view: &View) {
     let beers = vec_from_query(conn, query.as_str());
     let prompt = format!(
         "Are you sure you want to edit index {}: \"{}\" - (y/n)? ",
-        index, beers[index - view.offset].name
+        index,
+        beers[index - view.offset].name
     );
     let width = prompt.len() + 7;
     let action = tui_inp::dialog_box_get_string(width, 4, "Verify", &prompt);
@@ -143,11 +152,23 @@ pub fn edit(conn: &Connection, view: &View) {
             id: beers[index - view.offset].id.clone(),
             timestamp: tui_gen::timestamp(),
             name: tui_inp::get_string_default("Enter new name", &beers[index - view.offset].name),
-            brewer: tui_inp::get_string_default("Enter new brewer", &beers[index - view.offset].brewer),
-            style: tui_inp::get_string_default("Enter new style", &beers[index - view.offset].style),
+            brewer: tui_inp::get_string_default(
+                "Enter new brewer",
+                &beers[index - view.offset].brewer,
+            ),
+            style: tui_inp::get_string_default(
+                "Enter new style",
+                &beers[index - view.offset].style,
+            ),
             abv: tui_inp::get_string_default("Enter new abv", &beers[index - view.offset].abv),
-            rating: tui_inp::get_string_default("Enter new rating", &beers[index - view.offset].rating),
-            notes: tui_inp::get_string_default("Enter new notes", &beers[index - view.offset].notes),
+            rating: tui_inp::get_string_default(
+                "Enter new rating",
+                &beers[index - view.offset].rating,
+            ),
+            notes: tui_inp::get_string_default(
+                "Enter new notes",
+                &beers[index - view.offset].notes,
+            ),
         };
 
         // update record
