@@ -5,6 +5,8 @@ use rusqlite::Connection;
 use std::env;
 use std::path::Path;
 use std::process;
+use crossterm::{execute, Result, terminal::{EnterAlternateScreen, LeaveAlternateScreen}};
+use std::io::stdout;
 
 mod beer_struct;
 mod config;
@@ -18,7 +20,9 @@ mod ui;
 
 use crate::config::Config;
 
-fn main() {
+fn main() -> Result<()> {
+    execute!(stdout(), EnterAlternateScreen)?;
+
     tui_gen::splash_screen(
         "D E F I N I T I V E  B E E R  D A T A B A S E",
         format!("v{}", env!("CARGO_PKG_VERSION")).as_str(),
@@ -35,6 +39,8 @@ fn main() {
     let conn = Connection::open(db_path).expect("cannot connect to db");
 
     menu(&conn);
+
+    execute!(stdout(), LeaveAlternateScreen)
 }
 
 fn menu(conn: &Connection) {
@@ -107,7 +113,8 @@ fn menu(conn: &Connection) {
             }
             'q' => {
                 tui_gen::cls();
-                process::exit(1);
+                //process::exit(1);
+                break;
             }
             'r' => {
                 db::remove(&conn, &view);
@@ -119,7 +126,7 @@ fn menu(conn: &Connection) {
                 }
                 view.offset = 0;
             }
-            _ => process::exit(1),
+            _ => break, //process::exit(1),
         }
         view.clone().show(&conn);
     }
