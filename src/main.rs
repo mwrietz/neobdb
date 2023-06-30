@@ -5,8 +5,8 @@ use rusqlite::Connection;
 use std::env;
 use std::path::Path;
 use std::process;
-use crossterm::{execute, Result, terminal::{EnterAlternateScreen, LeaveAlternateScreen}};
-use std::io::stdout;
+//use crossterm::{execute, Result, terminal::{EnterAlternateScreen, LeaveAlternateScreen}};
+//use std::io::stdout;
 
 mod beer_struct;
 mod config;
@@ -20,8 +20,9 @@ mod ui;
 
 use crate::config::Config;
 
-fn main() -> Result<()> {
-    execute!(stdout(), EnterAlternateScreen)?;
+//fn main() -> Result<()> {
+fn main() {
+    //execute!(stdout(), EnterAlternateScreen)?;
 
     tui_gen::splash_screen(
         "D E F I N I T I V E  B E E R  D A T A B A S E",
@@ -40,7 +41,7 @@ fn main() -> Result<()> {
 
     menu(&conn);
 
-    execute!(stdout(), LeaveAlternateScreen)
+    //execute!(stdout(), LeaveAlternateScreen)
 }
 
 fn menu(conn: &Connection) {
