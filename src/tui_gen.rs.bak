@@ -1,23 +1,41 @@
 #![allow(dead_code)]
 
+//use colored::Colorize;
 use crossterm::{
     cursor, execute,
     style::{Color, Print, ResetColor, SetForegroundColor, Stylize},
-    terminal::{Clear, ClearType},
 };
 use getch::Getch;
 use std::env;
 use std::io::{stdout, Write};
 
+use crate::tui_gen;
+
+fn clr(c: &str) -> Color {
+    let c_upper: &str = &c.to_uppercase();
+    match c_upper {
+        "RED" => Color::Red,
+        "DARKRED" => Color::DarkRed,
+        "BLUE" => Color::Blue,
+        "DARKBLUE" => Color::DarkBlue,
+        "CYAN" => Color::Cyan,
+        "DARKCYAN" => Color::DarkCyan,
+        "GREEN" => Color::Green,
+        "DARKGREEN" => Color::DarkGreen,
+        "GREY" => Color::Grey,
+        "YELLOW" => Color::Yellow,
+        "DARKYELLOW" => Color::DarkYellow,
+        "MAGENTA" => Color::Magenta,
+        "DARKMAGENTA" => Color::DarkMagenta,
+        _ => Color::White,
+    }
+}
+
 pub fn cls() {
     std::process::Command::new("clear").status().unwrap();
 }
 
-pub fn clear_line() {
-    execute!(stdout(), Clear(ClearType::CurrentLine)).unwrap();
-}
-
-pub fn cursor_move(x: usize, y: usize) {
+pub fn cmove(x: usize, y: usize) {
     execute!(stdout(), cursor::MoveTo(x as u16, y as u16)).unwrap();
 }
 
@@ -31,9 +49,10 @@ pub fn get_prog_name() -> String {
     prog_name
 }
 
-pub fn horiz_line(color: Color) {
-    let (width, _) = tsize();
+pub fn horiz_line(color: &str) {
+    let (width, _height) = tui_gen::tsize();
     for _i in 0..width as usize {
+        //print!("{}", "─".color(color).bold());
         print_color_bold("─", color);
     }
     println!("");
@@ -42,41 +61,44 @@ pub fn horiz_line(color: Color) {
 pub fn pause() {
     let (w, h) = tsize();
     let clear_message = "                            ";
+    //let message = "Press any key to continue...".blue();
     let message = "Press any key to continue...";
     let message_len: usize = message.len();
-    cursor_move((w - message_len) / 2, h - 2);
-    print_color(message, Color::DarkBlue);
+    cmove((w - message_len) / 2, h - 2);
+    //print!("{}", message);
+    print_color(message, "DARKBLUE");
     std::io::stdout().flush().unwrap();
     let g = Getch::new();
     let _keypress = g.getch().unwrap();
-    cursor_move((w - message_len) / 2, h - 2);
+    cmove((w - message_len) / 2, h - 2);
     print!("{}", clear_message);
 }
 
-pub fn print_color(my_str: &str, color: Color) {
+pub fn print_color(my_str: &str, color: &str) {
     execute!(
         stdout(),
-        SetForegroundColor(color),
+        SetForegroundColor(clr(color)),
         Print(my_str),
         ResetColor
     )
     .expect("print_color error");
 }
 
-pub fn print_color_bold(my_str: &str, color: Color) {
+pub fn print_color_bold(my_str: &str, color: &str) {
     execute!(
         stdout(),
-        SetForegroundColor(color),
+        SetForegroundColor(clr(color)),
         Print(my_str.bold()),
         ResetColor
     )
     .expect("print_color_bold error");
 }
 
-pub fn print_title(title_string: &str, color: Color) {
+pub fn print_title(title_string: &str, color: &str) {
     println!("");
     for c in title_string.chars() {
         print!("{}", " ");
+        //print!("{}", c.to_string().color(color).bold());
         print_color_bold(&c.to_string(), color);
     }
     println!("");
@@ -85,15 +107,18 @@ pub fn print_title(title_string: &str, color: Color) {
 }
 
 pub fn splash_screen(line1: &str, line2: &str) {
+    //const VERSION: &str = env!("CARGO_PKG_VERSION");
+
     cls();
     let (width, height) = tsize();
 
     let line1_length: usize = line1.len();
-    cursor_move(width / 2 - line1_length / 2, height / 2 - 1);
-    print_color_bold(line1, Color::White);
+    cmove(width / 2 - line1_length / 2, height / 2 - 1);
+    //println!("{}", line1.bold());
+    print_color_bold(line1, "DARKBLUE");
 
     let line2_length: usize = line2.len();
-    cursor_move(width / 2 - line2_length / 2, height / 2 + 1);
+    cmove(width / 2 - line2_length / 2, height / 2 + 1);
     println!("{}", line2);
 
     execute!(stdout(), cursor::Hide).unwrap();
@@ -140,7 +165,7 @@ impl TermStat {
         if y > (self.height - 5) {
             pause();
             cls();
-            cursor_move(0, 0);
+            cmove(0, 0);
         }
     }
 }
@@ -166,4 +191,13 @@ pub fn tsize() -> (usize, usize) {
         Err(error) => panic!("tsize error: {:?}", error),
     };
     (w as usize, h as usize)
+}
+
+pub fn t_height() -> usize {
+    let size = crossterm::terminal::size();
+    let (_w, h) = match size {
+        Ok((w, h)) => (w, h),
+        Err(error) => panic!("tsize error: {:?}", error),
+    };
+    h as usize
 }

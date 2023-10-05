@@ -1,12 +1,5 @@
 // 20230623
 
-//use crossterm::{
-//    cursor,
-//    execute,
-//    style::{Color, Print, ResetColor, SetBackgroundColor, SetForegroundColor},
-//};
-use crossterm::style::Color;
-
 use rusqlite::Connection;
 
 use crate::db;
@@ -54,9 +47,7 @@ impl View {
 
     pub fn show(mut self, conn: &Connection) {
         tui_gen::cls();
-        //self.height = tui_gen::t_height();
-        let (_w, h) = tui_gen::tsize();
-        self.height = h;
+        self.height = tui_gen::t_height();
         match self.state {
             State::Summary => {
                 print_header();
@@ -83,15 +74,13 @@ impl View {
     }
 
     fn display_filter(&self) {
-        //tui_gen::cmove(72, 1);
-        tui_gen::cursor_move(72, 1);
+        tui_gen::cmove(72, 1);
         print!("Search String: '");
-        //tui_gen::print_color(self.filter.as_str(), "DARKGREEN");
-        tui_gen::print_color(self.filter.as_str(), Color::DarkGreen);
+        tui_gen::print_color(self.filter.as_str(), "DARKGREEN");
         print!("'");
         match self.state {
-            State::Summary => tui_gen::cursor_move(0, 5),
-            State::Detail => tui_gen::cursor_move(0, 4),
+            State::Summary => tui_gen::cmove(0, 5),
+            State::Detail => tui_gen::cmove(0, 4),
         }
     }
 }
@@ -101,27 +90,18 @@ pub fn print_summary_header() {
         "{:4} {:30} {:35} {:20}\n",
         "idx:", "name:", "brewer:", "style:"
     );
-    //tui_gen::print_color(&header_string, "DARKBLUE");
-    tui_gen::print_color(&header_string, Color::DarkBlue);
+    tui_gen::print_color(&header_string, "DARKBLUE");
 }
 pub fn print_header() {
     let title = "DEFINITIVE BEER DATABASE";
-    //tui_gen::print_title(&title, "DARKBLUE");
-    tui_gen::print_title(&title, Color::DarkBlue);
-    tui_gen::cursor_move(50, 1);
-    //tui_gen::print_color("(", "DARKBLUE");
-    tui_gen::print_color("(", Color::DarkBlue);
-    //tui_gen::print_color(tui_gen::get_prog_name().as_str(), "DARKGREEN");
-    tui_gen::print_color(tui_gen::get_prog_name().as_str(), Color::DarkGreen);
-    //tui_gen::print_color(
-    //    format!(" v{}", env!("CARGO_PKG_VERSION")).as_str(),
-    //    "DARKBLUE",
-    //);
+    tui_gen::print_title(&title, "DARKBLUE");
+    tui_gen::cmove(50, 1);
+    tui_gen::print_color("(", "DARKBLUE");
+    tui_gen::print_color(tui_gen::get_prog_name().as_str(), "DARKGREEN");
     tui_gen::print_color(
         format!(" v{}", env!("CARGO_PKG_VERSION")).as_str(),
-        Color::DarkBlue,
+        "DARKBLUE",
     );
-    //tui_gen::print_color(")", "DARKBLUE");
-    tui_gen::print_color(")", Color::DarkBlue);
-    tui_gen::cursor_move(0, 4);
+    tui_gen::print_color(")", "DARKBLUE");
+    tui_gen::cmove(0, 4);
 }

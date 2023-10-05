@@ -45,9 +45,11 @@ fn main() {
 }
 
 fn menu(conn: &Connection) {
+    let (_w, h) = tui_gen::tsize();
     let mut view = ui::View {
         state: ui::State::Summary,
-        height: tui_gen::t_height(),
+        //height: tui_gen::t_height(),
+        height: h,
         offset: 0,
         filter: String::from(""),
     };
@@ -78,8 +80,8 @@ fn menu(conn: &Connection) {
 
     loop {
         let selection = match view.filter.len() {
-            0 => tui_menu::menu_horiz(&full_menu_items),
-            _ => tui_menu::menu_horiz(&filter_menu_items),
+            0 => tui_menu::menu_horiz_neo(&full_menu_items),
+            _ => tui_menu::menu_horiz_neo(&filter_menu_items),
         };
 
         match selection {
