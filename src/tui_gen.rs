@@ -90,11 +90,13 @@ pub fn splash_screen(line1: &str, line2: &str) {
 
     let line1_length: usize = line1.len();
     cursor_move(width / 2 - line1_length / 2, height / 2 - 1);
-    print_color_bold(line1, Color::White);
+    //print_color_bold(line1, Color::White);
+    print_color_bold(line1, Color::DarkBlue);
 
     let line2_length: usize = line2.len();
     cursor_move(width / 2 - line2_length / 2, height / 2 + 1);
-    println!("{}", line2);
+    //println!("{}", line2);
+    print_color_bold(line2, Color::Rgb{r:255, g:135, b:0});
 
     execute!(stdout(), cursor::Hide).unwrap();
 
