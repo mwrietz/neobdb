@@ -135,8 +135,8 @@ pub fn menu_horiz_neo(items: &Vec<(&str, &str)>) -> char {
 fn print_title_block() {
     execute!(
         stdout(),
-        SetForegroundColor(Color::White),
-        //SetForegroundColor(Color::Black),
+        //SetForegroundColor(Color::White),
+        SetForegroundColor(Color::Black),
         //SetBackgroundColor(Color::DarkGreen),
         //SetBackgroundColor(Color::DarkYellow),
         //SetBackgroundColor(Color::DarkMagenta),
