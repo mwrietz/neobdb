@@ -11,10 +11,13 @@ use getch::Getch;
 use std::io;
 use std::io::{stdout, Write};
 
+use crate::tui_gen;
 use crate::tui_gen::cursor_move;
 use crate::tui_gen::horiz_line;
 use crate::tui_gen::tsize;
 use crate::tui_gen::print_color;
+//use crate::tui_gen::get_prog_name;
+//mod tui_gen;
 
 pub fn menu(menu_title: &str, items: &Vec<&str>) -> u8 {
     println!("{}", menu_title);
@@ -133,17 +136,14 @@ pub fn menu_horiz_neo(items: &Vec<(&str, &str)>) -> char {
 }
 
 fn print_title_block() {
+    let prog_name = tui_gen::get_prog_name();
     execute!(
         stdout(),
-        //SetForegroundColor(Color::White),
-        SetForegroundColor(Color::Black),
-        //SetBackgroundColor(Color::DarkGreen),
-        //SetBackgroundColor(Color::DarkYellow),
-        //SetBackgroundColor(Color::DarkMagenta),
+        SetForegroundColor(Color::White),
         // 208 DarkOrange 255,135,0
         SetBackgroundColor(Color::Rgb{r:255, g:135, b:0}),
-        //SetBackgroundColor(Color::DarkBlue),
-        Print(" neobdb "),
+        //Print(" tui_menu "),
+        Print(format!(" {} ", prog_name)),
         ResetColor
     ).expect("print_title_block error");
 }
