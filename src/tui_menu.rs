@@ -139,7 +139,7 @@ fn print_title_block() {
     let prog_name = tui_gen::get_prog_name();
     execute!(
         stdout(),
-        SetForegroundColor(Color::White),
+        SetForegroundColor(Color::Black),
         // 208 DarkOrange 255,135,0
         SetBackgroundColor(Color::Rgb{r:255, g:135, b:0}),
         //Print(" tui_menu "),
