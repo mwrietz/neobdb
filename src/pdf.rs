@@ -56,7 +56,9 @@ fn create_md_file(md_path: &Path, beers: Vec<Beer>) {
         .write_all(b"| :------- | :------- | :--- | :--- | :---: | :-------- |\n")
         .expect("write error");
     //output.write(b"|  |  |  |  |  |  |\n").expect("write error");
-    output.write_all(b"|  |  |  |  |  |  |\n").expect("write error");
+    output
+        .write_all(b"|  |  |  |  |  |  |\n")
+        .expect("write error");
     for beer in beers {
         let buffer = format!(
             "| {} | {} | {} | {} | {} | {} |\n",
@@ -65,7 +67,9 @@ fn create_md_file(md_path: &Path, beers: Vec<Beer>) {
         //output.write(buffer.as_bytes()).expect("write error");
         output.write_all(buffer.as_bytes()).expect("write error");
         //output.write(b"|  |  |  |  |  |  |\n").expect("write error");
-        output.write_all(b"|  |  |  |  |  |  |\n").expect("write error");
+        output
+            .write_all(b"|  |  |  |  |  |  |\n")
+            .expect("write error");
     }
 }
 

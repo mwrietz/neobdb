@@ -21,12 +21,12 @@ pub fn query_filtered(view: &View) -> String {
     //     0 => query_full(),
     //     _ => format!(
     //         "SELECT * FROM Beer
-    //             WHERE name LIKE '%{}%' 
-    //             OR brewer LIKE '%{}%' 
-    //             OR style LIKE '%{}%' 
-    //             OR abv LIKE '%{}%' 
-    //             OR rating LIKE '%{}%' 
-    //             OR notes LIKE '%{}%' 
+    //             WHERE name LIKE '%{}%'
+    //             OR brewer LIKE '%{}%'
+    //             OR style LIKE '%{}%'
+    //             OR abv LIKE '%{}%'
+    //             OR rating LIKE '%{}%'
+    //             OR notes LIKE '%{}%'
     //             ORDER BY brewer, name",
     //         view.filter, view.filter, view.filter, view.filter, view.filter, view.filter,
     //     ),
@@ -59,12 +59,12 @@ pub fn query_for_display(view: &View) -> String {
     //     }
     //     _ => {
     //         format!(
-    //             "SELECT * FROM Beer WHERE name LIKE '%{}%' 
-    //                 OR brewer LIKE '%{}%' 
-    //                 OR style LIKE '%{}%' 
-    //                 OR abv LIKE '%{}%' 
-    //                 OR rating LIKE '%{}%' 
-    //                 OR notes LIKE '%{}%' 
+    //             "SELECT * FROM Beer WHERE name LIKE '%{}%'
+    //                 OR brewer LIKE '%{}%'
+    //                 OR style LIKE '%{}%'
+    //                 OR abv LIKE '%{}%'
+    //                 OR rating LIKE '%{}%'
+    //                 OR notes LIKE '%{}%'
     //                 ORDER BY brewer, name
     //                 LIMIT {}
     //                 OFFSET {}",
