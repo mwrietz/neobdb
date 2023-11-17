@@ -74,9 +74,10 @@ impl View {
             }
             index += 1;
         }
-        println!("");
+        println!();
 
-        if self.filter.len() > 0 {
+        //if self.filter.len() > 0 {
+        if !self.filter.is_empty() {
             self.display_filter();
         }
     }
@@ -103,15 +104,27 @@ pub fn print_summary_header() {
 }
 pub fn print_header() {
     let title = "DEFINITIVE BEER DATABASE";
-    tui_gen::print_title(&title, Color::DarkBlue);
+    //tui_gen::print_title(&title, Color::DarkBlue);
+    tui_gen::print_title(title, Color::DarkBlue);
     // print version right justified
-    let (w, _h) = tui_gen::tsize(); 
+    let (w, _h) = tui_gen::tsize();
     tui_gen::cursor_move(w - 14, 1);
 
-    tui_gen::print_color(tui_gen::get_prog_name().as_str(), Color::Rgb{r:255, g:135, b:0});
+    tui_gen::print_color(
+        tui_gen::get_prog_name().as_str(),
+        Color::Rgb {
+            r: 255,
+            g: 135,
+            b: 0,
+        },
+    );
     tui_gen::print_color(
         format!(" v{}", env!("CARGO_PKG_VERSION")).as_str(),
-       Color::Rgb{r:255, g:135, b:0},
+        Color::Rgb {
+            r: 255,
+            g: 135,
+            b: 0,
+        },
     );
     tui_gen::cursor_move(0, 4);
 }

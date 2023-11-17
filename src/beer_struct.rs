@@ -29,7 +29,14 @@ impl Beer {
         buff_tuple.push((format!("{:5} ", "name:"), Color::DarkGrey));
         buff_tuple.push((format!("{:37} ", self.name), Color::DarkGreen));
         buff_tuple.push((format!("{:7} ", "brewer:"), Color::DarkGrey));
-        buff_tuple.push((format!("{:36} ", self.brewer), Color::Rgb{r:255, g:135, b:0}));
+        buff_tuple.push((
+            format!("{:36} ", self.brewer),
+            Color::Rgb {
+                r: 255,
+                g: 135,
+                b: 0,
+            },
+        ));
         for b in buff_tuple {
             print_color(b.0.as_str(), b.1);
         }
@@ -52,7 +59,10 @@ impl Beer {
         buff_tuple.push((format!("{:7} ", "abv:"), Color::DarkGrey));
         buff_tuple.push((format!("{:5} ", self.abv), Color::White));
         buff_tuple.push((format!("{:5} ", "uuid:"), Color::DarkGrey));
-        buff_tuple.push((format!("{:37} ", self.id.trim_end_matches('\n')), Color::White));
+        buff_tuple.push((
+            format!("{:37} ", self.id.trim_end_matches('\n')),
+            Color::White,
+        ));
         buff_tuple.push((format!("{:7} ", "notes:"), Color::DarkGrey));
         buff_tuple.push((format!("{:36}", self.notes), Color::White));
         for b in buff_tuple {

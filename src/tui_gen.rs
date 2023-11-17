@@ -33,10 +33,11 @@ pub fn get_prog_name() -> String {
 
 pub fn horiz_line(color: Color) {
     let (width, _) = tsize();
-    for _i in 0..width as usize {
+    //for _i in 0..width as usize {
+    for _i in 0..width {
         print_color_bold("─", color);
     }
-    println!("");
+    println!();
 }
 
 pub fn pause() {
@@ -74,14 +75,14 @@ pub fn print_color_bold(my_str: &str, color: Color) {
 }
 
 pub fn print_title(title_string: &str, color: Color) {
-    println!("");
+    println!();
     for c in title_string.chars() {
-        print!("{}", " ");
+        print!(" ");
         print_color_bold(&c.to_string(), color);
     }
-    println!("");
+    println!();
     horiz_line(color);
-    println!("");
+    println!();
 }
 
 pub fn splash_screen(line1: &str, line2: &str) {
@@ -96,7 +97,14 @@ pub fn splash_screen(line1: &str, line2: &str) {
     let line2_length: usize = line2.len();
     cursor_move(width / 2 - line2_length / 2, height / 2 + 1);
     //println!("{}", line2);
-    print_color_bold(line2, Color::Rgb{r:255, g:135, b:0});
+    print_color_bold(
+        line2,
+        Color::Rgb {
+            r: 255,
+            g: 135,
+            b: 0,
+        },
+    );
 
     execute!(stdout(), cursor::Hide).unwrap();
 
@@ -149,7 +157,7 @@ impl TermStat {
 
 pub fn timestamp() -> String {
     let now = chrono::Local::now();
-    return now.to_string();
+    now.to_string()
 }
 
 pub fn tpos() -> (usize, usize) {

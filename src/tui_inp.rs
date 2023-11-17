@@ -5,8 +5,8 @@ use crossterm::style::Color;
 use std::io::Write;
 
 use crate::tui_gen::cursor_move;
-use crate::tui_gen::tsize;
 use crate::tui_gen::print_color;
+use crate::tui_gen::tsize;
 
 use crate::tui_frm::Frame;
 
@@ -85,9 +85,9 @@ pub fn get_string_default(prompt: &str, default: &str) -> String {
     }
 
     if buffer.eq("") {
-        return default.to_string();
+        default.to_string()
     } else {
-        return buffer;
+        buffer
     }
 }
 
@@ -116,9 +116,10 @@ pub fn dialog_box_get_string(width: usize, height: usize, title: &str, prompt: &
     print_color(title, Color::Red);
     print!(" ");
     cursor_move(x + 3, y + 2);
-    let s = get_string(prompt);
-
-    s
+    // let s = get_string(prompt);
+    //
+    // s
+    get_string(prompt)
 }
 
 //
@@ -189,4 +190,3 @@ pub fn get_float_default(prompt: &str, default: f64) -> f64 {
         return buffer;
     }
 }
-

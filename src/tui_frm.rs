@@ -77,7 +77,8 @@ impl Frame<'_> {
         print_color(lr, self.frame_color);
         println!();
 
-        if self.title.len() > 0 {
+        //if self.title.len() > 0 {
+        if !self.title.is_empty() {
             // print title
             cursor_move(self.x + 2, self.y);
             //print!(" {} ", self.title.color(self.title_color));

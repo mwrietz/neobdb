@@ -12,12 +12,27 @@ use crate::ui;
 use crate::ui::View;
 
 pub fn query_full() -> String {
-    let query = format!("SELECT * FROM Beer ORDER BY brewer, name");
-    query
+    //let query = format!("SELECT * FROM Beer ORDER BY brewer, name");
+    "SELECT * FROM Beer ORDER BY brewer, name".to_string()
 }
 
 pub fn query_filtered(view: &View) -> String {
-    let query = match view.filter.len() {
+    // let query = match view.filter.len() {
+    //     0 => query_full(),
+    //     _ => format!(
+    //         "SELECT * FROM Beer
+    //             WHERE name LIKE '%{}%' 
+    //             OR brewer LIKE '%{}%' 
+    //             OR style LIKE '%{}%' 
+    //             OR abv LIKE '%{}%' 
+    //             OR rating LIKE '%{}%' 
+    //             OR notes LIKE '%{}%' 
+    //             ORDER BY brewer, name",
+    //         view.filter, view.filter, view.filter, view.filter, view.filter, view.filter,
+    //     ),
+    // };
+    // query
+    match view.filter.len() {
         0 => query_full(),
         _ => format!(
             "SELECT * FROM Beer
@@ -30,12 +45,42 @@ pub fn query_filtered(view: &View) -> String {
                 ORDER BY brewer, name",
             view.filter, view.filter, view.filter, view.filter, view.filter, view.filter,
         ),
-    };
-    query
+    }
 }
 
 pub fn query_for_display(view: &View) -> String {
-    let query = match view.filter.len() {
+    // let query = match view.filter.len() {
+    //     0 => {
+    //         format!(
+    //             "SELECT * FROM Beer ORDER BY brewer, name LIMIT {} OFFSET {}",
+    //             view.limit(),
+    //             view.offset
+    //         )
+    //     }
+    //     _ => {
+    //         format!(
+    //             "SELECT * FROM Beer WHERE name LIKE '%{}%' 
+    //                 OR brewer LIKE '%{}%' 
+    //                 OR style LIKE '%{}%' 
+    //                 OR abv LIKE '%{}%' 
+    //                 OR rating LIKE '%{}%' 
+    //                 OR notes LIKE '%{}%' 
+    //                 ORDER BY brewer, name
+    //                 LIMIT {}
+    //                 OFFSET {}",
+    //             view.filter,
+    //             view.filter,
+    //             view.filter,
+    //             view.filter,
+    //             view.filter,
+    //             view.filter,
+    //             view.limit(),
+    //             view.offset
+    //         )
+    //     }
+    // };
+    // query
+    match view.filter.len() {
         0 => {
             format!(
                 "SELECT * FROM Beer ORDER BY brewer, name LIMIT {} OFFSET {}",
@@ -64,8 +109,7 @@ pub fn query_for_display(view: &View) -> String {
                 view.offset
             )
         }
-    };
-    query
+    }
 }
 
 pub fn add(conn: &Connection) {
@@ -91,7 +135,8 @@ pub fn add(conn: &Connection) {
 
     let mut stmt = conn.prepare(query).expect("add stmt error");
 
-    stmt.execute(&[
+    //stmt.execute(&[
+    stmt.execute([
         &beer.id as &dyn ToSql,
         &beer.timestamp as &dyn ToSql,
         &beer.name as &dyn ToSql,
@@ -144,9 +189,9 @@ pub fn edit(conn: &Connection, view: &View) {
         tui_gen::cls();
         ui::print_header();
 
-        println!("");
+        println!();
         beers[index - view.offset].print_details(index);
-        println!("");
+        println!();
 
         let b = Beer {
             id: beers[index - view.offset].id.clone(),
@@ -176,7 +221,8 @@ pub fn edit(conn: &Connection, view: &View) {
 
         let mut stmt = conn.prepare(query).expect("add stmt error");
 
-        stmt.execute(&[
+        //stmt.execute(&[
+        stmt.execute([
             &b.timestamp as &dyn ToSql,
             &b.name as &dyn ToSql,
             &b.brewer as &dyn ToSql,
@@ -188,7 +234,7 @@ pub fn edit(conn: &Connection, view: &View) {
         ])
         .expect("edit() execute error");
 
-        println!("");
+        println!();
         println!("Updated record...");
         b.print_details(index);
     }
@@ -261,7 +307,8 @@ pub fn create_database_if_not_exist(db_path: &Path) {
 
     let mut stmt = conn.prepare(query).expect("add stmt error");
 
-    stmt.execute(&[
+    //stmt.execute(&[
+    stmt.execute([
         &beer.id as &dyn ToSql,
         &beer.timestamp as &dyn ToSql,
         &beer.name as &dyn ToSql,

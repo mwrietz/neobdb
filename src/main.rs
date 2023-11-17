@@ -34,7 +34,8 @@ fn main() {
     let db_path = Path::new(db_path.as_str());
 
     if !db_path.exists() {
-        db::create_database_if_not_exist(&db_path);
+        //db::create_database_if_not_exist(&db_path);
+        db::create_database_if_not_exist(db_path);
     }
 
     let conn = Connection::open(db_path).expect("cannot connect to db");
@@ -55,7 +56,8 @@ fn menu(conn: &Connection) {
     };
     tui_gen::cls();
     ui::print_header();
-    view.clone().show(&conn);
+    //view.clone().show(&conn);
+    view.clone().show(conn);
 
     let full_menu_items = vec![
         ("j", "Scroll_DN"),
@@ -86,14 +88,16 @@ fn menu(conn: &Connection) {
 
         match selection {
             'a' => {
-                db::add(&conn);
+                //db::add(&conn);
+                db::add(conn);
             }
             'c' => {
                 view.filter = "".to_string();
                 view.offset = 0;
             }
             'e' => {
-                db::edit(&conn, &view);
+                //db::edit(&conn, &view);
+                db::edit(conn, &view);
             }
             'f' => {
                 view.filter =
@@ -111,7 +115,8 @@ fn menu(conn: &Connection) {
                 }
             }
             'p' => {
-                pdf::create_pdf(&conn);
+                //pdf::create_pdf(&conn);
+                pdf::create_pdf(conn);
                 tui_gen::pause();
             }
             'q' => {
@@ -120,7 +125,8 @@ fn menu(conn: &Connection) {
                 break;
             }
             'r' => {
-                db::remove(&conn, &view);
+                //db::remove(&conn, &view);
+                db::remove(conn, &view);
             }
             'v' => {
                 match view.state {
@@ -131,6 +137,7 @@ fn menu(conn: &Connection) {
             }
             _ => break, //process::exit(1),
         }
-        view.clone().show(&conn);
+        //view.clone().show(&conn);
+        view.clone().show(conn);
     }
 }
