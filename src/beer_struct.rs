@@ -1,12 +1,9 @@
 // beer_struct.rs
-// 20231026
 
 use crossterm::style::Color;
-
 use serde::{Deserialize, Serialize};
 
-use crate::tui_gen::print_color;
-use crate::tui_gen::print_color_bold;
+use crate::tui_gen::{print_color, print_color_bold};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Beer {
@@ -73,7 +70,6 @@ impl Beer {
     }
 
     pub fn print_summary(&self, index: usize) {
-        //print!("{:4} ", index);
         let buffer = format!("{:4} ", index);
         print_color(buffer.as_str(), Color::DarkGrey);
         let buffer = format!("{:30} ", self.name);

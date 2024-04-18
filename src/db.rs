@@ -1,5 +1,4 @@
 // bdb - definitive beer database
-// 20220623
 
 use rusqlite::{Connection, ToSql};
 use std::fs;
@@ -8,30 +7,13 @@ use std::path::Path;
 use crate::beer_struct::Beer;
 use crate::tui_gen;
 use crate::tui_inp;
-use crate::ui;
-use crate::ui::View;
+use crate::ui::{self, View};
 
 pub fn query_full() -> String {
-    //let query = format!("SELECT * FROM Beer ORDER BY brewer, name");
     "SELECT * FROM Beer ORDER BY brewer, name".to_string()
 }
 
 pub fn query_filtered(view: &View) -> String {
-    // let query = match view.filter.len() {
-    //     0 => query_full(),
-    //     _ => format!(
-    //         "SELECT * FROM Beer
-    //             WHERE name LIKE '%{}%'
-    //             OR brewer LIKE '%{}%'
-    //             OR style LIKE '%{}%'
-    //             OR abv LIKE '%{}%'
-    //             OR rating LIKE '%{}%'
-    //             OR notes LIKE '%{}%'
-    //             ORDER BY brewer, name",
-    //         view.filter, view.filter, view.filter, view.filter, view.filter, view.filter,
-    //     ),
-    // };
-    // query
     match view.filter.len() {
         0 => query_full(),
         _ => format!(
@@ -49,37 +31,6 @@ pub fn query_filtered(view: &View) -> String {
 }
 
 pub fn query_for_display(view: &View) -> String {
-    // let query = match view.filter.len() {
-    //     0 => {
-    //         format!(
-    //             "SELECT * FROM Beer ORDER BY brewer, name LIMIT {} OFFSET {}",
-    //             view.limit(),
-    //             view.offset
-    //         )
-    //     }
-    //     _ => {
-    //         format!(
-    //             "SELECT * FROM Beer WHERE name LIKE '%{}%'
-    //                 OR brewer LIKE '%{}%'
-    //                 OR style LIKE '%{}%'
-    //                 OR abv LIKE '%{}%'
-    //                 OR rating LIKE '%{}%'
-    //                 OR notes LIKE '%{}%'
-    //                 ORDER BY brewer, name
-    //                 LIMIT {}
-    //                 OFFSET {}",
-    //             view.filter,
-    //             view.filter,
-    //             view.filter,
-    //             view.filter,
-    //             view.filter,
-    //             view.filter,
-    //             view.limit(),
-    //             view.offset
-    //         )
-    //     }
-    // };
-    // query
     match view.filter.len() {
         0 => {
             format!(
@@ -135,7 +86,6 @@ pub fn add(conn: &Connection) {
 
     let mut stmt = conn.prepare(query).expect("add stmt error");
 
-    //stmt.execute(&[
     stmt.execute([
         &beer.id as &dyn ToSql,
         &beer.timestamp as &dyn ToSql,
@@ -221,7 +171,6 @@ pub fn edit(conn: &Connection, view: &View) {
 
         let mut stmt = conn.prepare(query).expect("add stmt error");
 
-        //stmt.execute(&[
         stmt.execute([
             &b.timestamp as &dyn ToSql,
             &b.name as &dyn ToSql,
@@ -307,7 +256,6 @@ pub fn create_database_if_not_exist(db_path: &Path) {
 
     let mut stmt = conn.prepare(query).expect("add stmt error");
 
-    //stmt.execute(&[
     stmt.execute([
         &beer.id as &dyn ToSql,
         &beer.timestamp as &dyn ToSql,

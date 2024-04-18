@@ -1,12 +1,4 @@
-// 20230623
-
-//use crossterm::{
-//    cursor,
-//    execute,
-//    style::{Color, Print, ResetColor, SetBackgroundColor, SetForegroundColor},
-//};
 use crossterm::style::Color;
-
 use rusqlite::Connection;
 
 use crate::db;

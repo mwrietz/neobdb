@@ -1,9 +1,7 @@
 // configuration file functions
-// 20230611
 
 use std::env;
-use std::fs;
-use std::fs::File;
+use std::fs::{self, File};
 use std::path::PathBuf;
 use std::process;
 
@@ -20,7 +18,6 @@ pub fn read_config_file() -> Config {
     let config_file_path = dot_config_path.join("config.json");
 
     // open configuration file
-    //let config_file = match File::open(&config_file_path) {
     let config_file = match File::open(config_file_path) {
         Err(_msg) => {
             create_config_file();

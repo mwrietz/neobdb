@@ -1,16 +1,11 @@
 #![allow(dead_code)]
 
 use crossterm::style::Color;
-//use crate::tui_gen::cmove;
-use crate::tui_gen::cursor_move;
-use crate::tui_gen::print_color;
-//use colored::Colorize;
+use crate::tui_gen::{cursor_move, print_color};
 
 pub struct Frame<'a> {
     pub title: &'a str,
-    //pub title_color: &'a str,
     pub title_color: Color,
-    //pub frame_color: &'a str,
     pub frame_color: Color,
     pub x: usize,
     pub y: usize,
@@ -29,12 +24,6 @@ impl Frame<'_> {
         }
     }
     pub fn display(&self) {
-        //let ul = "╭".color(self.frame_color);
-        //let ur = "╮".color(self.frame_color);
-        //let ll = "╰".color(self.frame_color);
-        //let lr = "╯".color(self.frame_color);
-        //let hor = "─".color(self.frame_color);
-        //let ver = "│".color(self.frame_color);
         let ul = "╭";
         let ur = "╮";
         let ll = "╰";
@@ -44,44 +33,33 @@ impl Frame<'_> {
 
         // draw top horizontal
         cursor_move(self.x, self.y);
-        //print!("{}", ul);
         print_color(ul, self.frame_color);
         for _i in 0..(self.w - 2) {
-            //print!("{}", hor);
             print_color(hor, self.frame_color);
         }
-        //print!("{}", ur);
         print_color(ur, self.frame_color);
 
         // draw middle
         for i in 0..(self.h - 1) {
             cursor_move(self.x, self.y + i + 1);
-            //print!("{}", ver);
             print_color(ver, self.frame_color);
             for _j in 0..(self.w - 2) {
                 print!(" ");
             }
-            //print!("{}", ver);
             print_color(ver, self.frame_color);
         }
 
         // draw bottom horizontal
         cursor_move(self.x, self.y + self.h);
-        //print!("{}", ll);
         print_color(ll, self.frame_color);
         for _i in 0..(self.w - 2) {
-            //print!("{}", hor);
             print_color(hor, self.frame_color);
         }
-        //println!("{}", lr);
         print_color(lr, self.frame_color);
         println!();
 
-        //if self.title.len() > 0 {
         if !self.title.is_empty() {
-            // print title
             cursor_move(self.x + 2, self.y);
-            //print!(" {} ", self.title.color(self.title_color));
             print!(" ");
             print_color(self.title, self.title_color);
             print!(" ");

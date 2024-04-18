@@ -1,18 +1,17 @@
 // pdf.rs
-// 20230623
+
+use std::fs::File;
+use std::io::Write;
+use std::path::Path;
+
+use rusqlite::Connection;
 
 use crate::db;
 use crate::process;
 use crate::tui_gen;
 use crate::ui;
-use rusqlite::Connection;
-use std::fs::File;
-use std::io::Write;
-use std::path::Path;
-
 use crate::beer_struct::Beer;
-use crate::config;
-use crate::config::Config;
+use crate::config::{self, Config};
 
 pub fn create_pdf(conn: &Connection) {
     let config: Config = config::read_config_file();
@@ -35,27 +34,20 @@ pub fn create_pdf(conn: &Connection) {
 fn create_md_file(md_path: &Path, beers: Vec<Beer>) {
     println!("creating {}...", md_path.display());
     let mut output = File::create(md_path).expect("error opening file");
-    //output.write(b"---\n").expect("write error");
     output.write_all(b"---\n").expect("write error");
     output
-        //.write(b"geometry: margin=2cm\n")
         .write_all(b"geometry: margin=2cm\n")
         .expect("write error");
-    //output.write(b"---\n").expect("write error");
     output.write_all(b"---\n").expect("write error");
     output
-        //.write(b"Table: **Definitive Beer Database**\n\n")
         .write_all(b"Table: **Definitive Beer Database**\n\n")
         .expect("write error");
     output
-        //.write(b"| name | brewer | style | abv | rating | notes |\n")
         .write_all(b"| name | brewer | style | abv | rating | notes |\n")
         .expect("write error");
     output
-        //.write(b"| :------- | :------- | :--- | :--- | :---: | :-------- |\n")
         .write_all(b"| :------- | :------- | :--- | :--- | :---: | :-------- |\n")
         .expect("write error");
-    //output.write(b"|  |  |  |  |  |  |\n").expect("write error");
     output
         .write_all(b"|  |  |  |  |  |  |\n")
         .expect("write error");
@@ -64,9 +56,7 @@ fn create_md_file(md_path: &Path, beers: Vec<Beer>) {
             "| {} | {} | {} | {} | {} | {} |\n",
             beer.name, beer.brewer, beer.style, beer.abv, beer.rating, beer.notes
         );
-        //output.write(buffer.as_bytes()).expect("write error");
         output.write_all(buffer.as_bytes()).expect("write error");
-        //output.write(b"|  |  |  |  |  |  |\n").expect("write error");
         output
             .write_all(b"|  |  |  |  |  |  |\n")
             .expect("write error");
