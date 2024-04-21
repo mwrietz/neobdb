@@ -84,6 +84,10 @@ pub fn print_title(title_string: &str, color: Color) {
     println!();
 }
 
+pub fn show_cursor() {
+    execute!(stdout(), cursor::Show).unwrap();
+}
+
 pub fn splash_screen(line1: &str, line2: &str) {
     cls();
     let (width, height) = tsize();

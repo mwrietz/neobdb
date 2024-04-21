@@ -108,6 +108,7 @@ fn menu(conn: &Connection) {
             }
             'q' => {
                 tui_gen::cls();
+                tui_gen::show_cursor();
                 break;
             }
             'r' => {
